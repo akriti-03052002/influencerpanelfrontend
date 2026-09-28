@@ -28,7 +28,7 @@ export default function SocialMedia() {
   ));
   const connect = async (platform) => {
     try {
-      const response = await api.get(`/partner/social/${platform}/start`);
+      const response = await api.get(`/partner/social/${platform}/start`, { params: { returnTo: window.location.origin } });
       window.location.assign(response.data.url);
     } catch (connectError) {
       setError(connectError.response?.data?.message || "Social login is not configured.");
