@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { Share2, LogIn } from "lucide-react";
+import { Share2, CheckCircle2, AlertCircle, X, ChevronDown, PenLine } from "lucide-react";
 import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
 import { Input, Select } from "../../components/ui/Input";
+import SocialConnectCard, { InstagramLogo, FacebookLogo } from "../../components/partner/SocialConnectCard";
 
 const PLATFORMS = ["instagram", "youtube", "facebook"];
+const CONNECTABLE = ["instagram", "facebook"];
+const PLATFORM_ICON = { instagram: InstagramLogo, facebook: FacebookLogo };
+
+const capitalize = (value) => (value ? value[0].toUpperCase() + value.slice(1) : "");
 
 // Meta sends the user back here with the connect outcome in the query string.
 const readOauthResult = () => {
@@ -17,27 +22,54 @@ const readOauthResult = () => {
 export default function SocialMedia() {
   const [oauthResult] = useState(readOauthResult);
   const [accounts, setAccounts] = useState([]);
-  const [form, setForm] = useState({ platform: "instagram", accountId: "", followers: "" });
+  const [form, setForm] = useState({ platform: "youtube", accountId: "", followers: "" });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [connecting, setConnecting] = useState(null);
+  const [refreshingId, setRefreshingId] = useState(null);
+  const [showManual, setShowManual] = useState(false);
   const [error, setError] = useState(() => (oauthResult.social === "error" ? oauthResult.message || "Couldn't connect this account." : ""));
   const [message, setMessage] = useState(() => (
     oauthResult.social === "connected"
-      ? `Your ${oauthResult.platform[0]?.toUpperCase() + oauthResult.platform.slice(1)} account was connected and submitted for admin review.`
+      ? `${capitalize(oauthResult.platform)} connected! Your follower count will now update automatically.`
       : ""
   ));
+
   const connect = async (platform) => {
+    setConnecting(platform);
+    setError("");
     try {
       const response = await api.get(`/partner/social/${platform}/start`, { params: { returnTo: window.location.origin } });
       window.location.assign(response.data.url);
     } catch (connectError) {
       setError(connectError.response?.data?.message || "Social login is not configured.");
+      setConnecting(null);
     }
   };
 
   const loadAccounts = async () => {
     const response = await api.get("/partner/social/accounts");
     setAccounts(response.data.data);
+  };
+
+  // An account linked through login (not typed in by hand) for this platform.
+  const connectedAccount = (platform) => accounts.find((account) => account.platform === platform && account.connected);
+  const needsReconnect = (platform) => accounts.some((account) => account.platform === platform && account.source === "oauth" && !account.connected);
+
+  const refresh = async (accountId) => {
+    setRefreshingId(accountId);
+    setError("");
+    setMessage("");
+    try {
+      await api.post(`/partner/social/accounts/${accountId}/refresh`);
+      await loadAccounts();
+      setMessage("Follower count updated.");
+    } catch (refreshError) {
+      setError(refreshError.response?.data?.message || "Couldn't refresh this account.");
+      await loadAccounts().catch(() => {});
+    } finally {
+      setRefreshingId(null);
+    }
   };
 
   useEffect(() => {
@@ -71,70 +103,119 @@ export default function SocialMedia() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Social Media Accounts</h1>
-        <p className="text-sm text-slate-500 mt-1">Submit your creator accounts for verification before submitting content.</p>
+        <p className="text-sm text-slate-500 mt-1">Connect your creator accounts so SPOTX can verify your reach before you submit content.</p>
       </div>
 
-      <Card className="p-6">
-        <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
-          <h2 className="font-semibold text-slate-900">Connect Instagram or Facebook</h2>
-          <p className="text-sm text-slate-500 mt-1 mb-3">Use Meta login to fetch your account ID and follower count automatically.</p>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" onClick={() => connect("instagram")}><LogIn size={16} /> Connect Instagram</Button>
-            <Button type="button" variant="outline" onClick={() => connect("facebook")}><LogIn size={16} /> Connect Facebook</Button>
-          </div>
+      {error && (
+        <div role="alert" className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 p-3.5 text-sm text-red-700">
+          <AlertCircle size={16} className="shrink-0 mt-0.5" />
+          <span className="flex-1">{error}</span>
+          <button type="button" onClick={() => setError("")} aria-label="Dismiss" className="text-red-400 hover:text-red-600"><X size={16} /></button>
         </div>
-        <form onSubmit={submit} className="space-y-4">
-          <h2 className="font-semibold text-slate-900">Add an account</h2>
-          {error && <p role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</p>}
-          {message && <p role="status" className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{message}</p>}
-          <div className="grid sm:grid-cols-3 gap-4">
-            <Select label="Platform" value={form.platform} onChange={(event) => setForm({ ...form, platform: event.target.value })}>
-              {PLATFORMS.map((platform) => <option key={platform} value={platform}>{platform[0].toUpperCase() + platform.slice(1)}</option>)}
-            </Select>
-            <Input
-              label="Account ID / handle"
-              value={form.accountId}
-              onChange={(event) => setForm({ ...form, accountId: event.target.value })}
-              placeholder="@yourhandle or channel ID"
-              required
-              maxLength={120}
+      )}
+      {message && (
+        <div role="status" className="flex items-start gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-sm text-emerald-700">
+          <CheckCircle2 size={16} className="shrink-0 mt-0.5" />
+          <span className="flex-1">{message}</span>
+          <button type="button" onClick={() => setMessage("")} aria-label="Dismiss" className="text-emerald-400 hover:text-emerald-600"><X size={16} /></button>
+        </div>
+      )}
+
+      <div className="grid md:grid-cols-2 gap-4">
+        {CONNECTABLE.map((platform) => {
+          const account = connectedAccount(platform);
+          return (
+            <SocialConnectCard
+              key={platform}
+              platform={platform}
+              account={loading ? null : account}
+              needsReconnect={!loading && !account && needsReconnect(platform)}
+              connecting={connecting === platform}
+              refreshing={Boolean(account) && refreshingId === account._id}
+              onConnect={() => connect(platform)}
+              onRefresh={() => account && refresh(account._id)}
             />
-            <Input
-              label="Follower / subscriber count"
-              type="number"
-              min="0"
-              step="1"
-              value={form.followers}
-              onChange={(event) => setForm({ ...form, followers: event.target.value })}
-              placeholder="e.g. 12500"
-              required
-            />
-          </div>
-          <Button type="submit" loading={busy}>Submit account</Button>
-        </form>
+          );
+        })}
+      </div>
+
+      <Card>
+        <button
+          type="button"
+          onClick={() => setShowManual((open) => !open)}
+          className="w-full p-5 flex items-center gap-3 text-left"
+          aria-expanded={showManual}
+        >
+          <span className="h-9 w-9 rounded-lg bg-slate-100 text-slate-500 grid place-items-center"><PenLine size={16} /></span>
+          <span className="flex-1">
+            <span className="block font-semibold text-slate-900">Add an account manually</span>
+            <span className="block text-xs text-slate-500">For YouTube, or if you can't connect above. An admin will verify it by hand.</span>
+          </span>
+          <ChevronDown size={18} className={`text-slate-400 transition ${showManual ? "rotate-180" : ""}`} />
+        </button>
+        {showManual && (
+          <form onSubmit={submit} className="px-5 pb-5 space-y-4 border-t border-slate-100 pt-4">
+            <div className="grid sm:grid-cols-3 gap-4">
+              <Select label="Platform" value={form.platform} onChange={(event) => setForm({ ...form, platform: event.target.value })}>
+                {PLATFORMS.map((platform) => <option key={platform} value={platform}>{capitalize(platform)}</option>)}
+              </Select>
+              <Input
+                label="Account ID / handle"
+                value={form.accountId}
+                onChange={(event) => setForm({ ...form, accountId: event.target.value })}
+                placeholder="@yourhandle or channel ID"
+                required
+                maxLength={120}
+              />
+              <Input
+                label="Follower / subscriber count"
+                type="number"
+                min="0"
+                step="1"
+                value={form.followers}
+                onChange={(event) => setForm({ ...form, followers: event.target.value })}
+                placeholder="e.g. 12500"
+                required
+              />
+            </div>
+            <Button type="submit" loading={busy}>Submit for review</Button>
+          </form>
+        )}
       </Card>
 
       <Card>
         <div className="p-5 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-900">Submitted accounts</h2>
+          <h2 className="font-semibold text-slate-900">All your accounts</h2>
         </div>
         {loading ? <p className="p-6 text-sm text-slate-400">Loading accounts...</p> : accounts.length === 0 ? (
           <div className="p-8 text-center text-sm text-slate-500">
             <Share2 size={24} className="mx-auto mb-2 text-slate-300" />
-            No accounts submitted yet.
+            No accounts yet — connect Instagram or Facebook above to get started.
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {accounts.map((account) => (
-              <div key={account._id} className="p-5 flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-900 capitalize">{account.platform} · {account.username || account.accountId}</p>
-                  <p className="text-sm text-slate-500">{Number(account.followers || 0).toLocaleString()} followers/subscribers</p>
-                  {account.rejectionReason && <p className="text-xs text-red-600 mt-1">Admin note: {account.rejectionReason}</p>}
+            {accounts.map((account) => {
+              const Icon = PLATFORM_ICON[account.platform];
+              return (
+                <div key={account._id} className="p-5 flex flex-col sm:flex-row sm:items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <p className="flex items-center gap-2 font-medium text-slate-900">
+                      {Icon ? <Icon size={16} /> : <Share2 size={16} />}
+                      <span className="capitalize">{account.platform}</span>
+                      <span className="text-slate-400">·</span>
+                      <span className="truncate">{account.username || account.accountId}</span>
+                    </p>
+                    <p className="text-sm text-slate-500 mt-0.5">
+                      {Number(account.followers || 0).toLocaleString()} followers/subscribers
+                      <span className="text-slate-300"> · </span>
+                      {account.connected ? "Auto-updating" : account.source === "oauth" ? "Connection lost" : "Added manually"}
+                    </p>
+                    {account.rejectionReason && <p className="text-xs text-red-600 mt-1">Admin note: {account.rejectionReason}</p>}
+                  </div>
+                  <Badge status={account.reviewStatus} />
                 </div>
-                <Badge status={account.reviewStatus} />
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Card>
