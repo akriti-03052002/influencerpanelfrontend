@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import api from "../services/api.js"
 import { usePartnerAuth } from "../context/PartnerAuthContext";
