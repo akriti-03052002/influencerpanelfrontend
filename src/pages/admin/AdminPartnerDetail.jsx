@@ -7,6 +7,7 @@ import Button from "../../components/ui/Button";
 import { Select } from "../../components/ui/Input";
 import DocumentPreviewModal from "../../components/admin/DocumentPreviewModal";
 import BankAccountPreviewModal from "../../components/admin/BankAccountPreviewModal";
+import SocialAccountRates from "../../components/admin/SocialAccountRates";
 import { UploadCloud, FileText, AlertCircle } from "lucide-react";
 
 const STATUS_OPTIONS = ["draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"];
@@ -156,6 +157,7 @@ export default function AdminPartnerDetail() {
 
       </div>
 
+      <SocialAccountRates partnerId={partner._id} accounts={partner.socialAccounts || []} onSaved={load} />
 
       <div>
         <h2 className="font-semibold text-slate-900 mb-3">KYC Documents</h2>

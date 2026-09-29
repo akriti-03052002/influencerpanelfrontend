@@ -7,6 +7,13 @@ import Badge from "../../components/ui/Badge";
 
 const formatPlatform = (platform) => platform ? platform[0].toUpperCase() + platform.slice(1) : "Social";
 
+// Verified accounts with a price are done here; their rates are edited from
+// the influencer's own page. Only accounts still needing a decision or a
+// first price stay in this queue.
+const needsAction = (account) =>
+  account.reviewStatus === "pending" ||
+  (account.reviewStatus === "verified" && !account.paymentRates?.post && !account.paymentRates?.reel);
+
 export default function AdminSocialMedia() {
   const [accounts, setAccounts] = useState([]);
   const [submissions, setSubmissions] = useState([]);
@@ -26,7 +33,7 @@ export default function AdminSocialMedia() {
       adminApi.get("/admin/social-media/accounts"),
       adminApi.get("/admin/social-media/posts")
     ]);
-    setAccounts(accountResponse.data.data);
+    setAccounts(accountResponse.data.data.filter(needsAction));
     setSubmissions(submissionResponse.data.data);
   };
 
@@ -120,10 +127,13 @@ export default function AdminSocialMedia() {
       <Card>
         <div className="p-5 border-b border-slate-100 flex items-center gap-2">
           <Share2 size={18} className="text-slate-500" />
-          <h2 className="font-semibold text-slate-900">Influencer account verification</h2>
+          <div>
+            <h2 className="font-semibold text-slate-900">Influencer account verification</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Accounts waiting for review or a first price. Once verified and priced, manage rates from the influencer's page.</p>
+          </div>
         </div>
         {loading ? <p className="p-6 text-sm text-slate-400">Loading accounts...</p> : accounts.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">No social accounts submitted.</p>
+          <p className="p-6 text-sm text-slate-500">Nothing to review — every account is verified and priced. Change an account's rates from the influencer's page (Influencers → View).</p>
         ) : (
           <div className="divide-y divide-slate-100">
             {accounts.map((account) => (
