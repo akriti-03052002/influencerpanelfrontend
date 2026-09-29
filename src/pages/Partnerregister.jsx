@@ -209,7 +209,7 @@ export default function PartnerRegister() {
           </div>
 
           <p className="text-slate-500 mt-2">
-            Become a Partner
+            Become a SPOTX Influencer
           </p>
 
         </div>
@@ -433,7 +433,7 @@ export default function PartnerRegister() {
             {loading
               ? "Creating Account..."
               : emailVerified
-              ? "Create Partner Account"
+              ? "Create Influencer Account"
               : "Verify your email to continue"}
           </button>
 

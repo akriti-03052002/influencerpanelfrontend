@@ -55,10 +55,10 @@ export default function AdminPartnerDetail() {
     let rejectionReason;
 
     if (selectedStatus === "rejected") {
-      rejectionReason = window.prompt("Reason for rejecting this partner? This will be shown to them and sent as a notification.");
+      rejectionReason = window.prompt("Reason for rejecting this influencer? This will be shown to them and sent as a notification.");
       if (rejectionReason === null) return;
       if (!rejectionReason.trim()) {
-        window.alert("A reason is required to reject a partner.");
+        window.alert("A reason is required to reject an influencer.");
         return;
       }
     }
@@ -145,7 +145,7 @@ export default function AdminPartnerDetail() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="p-6">
-          <h2 className="font-semibold text-slate-900 mb-4">Partner Status</h2>
+          <h2 className="font-semibold text-slate-900 mb-4">Influencer Status</h2>
           <div className="flex gap-3">
             <Select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="flex-1">
               {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s.replace(/_/g, " ")}</option>)}

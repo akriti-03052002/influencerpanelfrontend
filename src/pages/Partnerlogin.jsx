@@ -79,7 +79,7 @@ export default function PartnerLogin() {
           </div>
 
           <p className="text-slate-500 mt-2">
-            Partner Portal
+            Influencer Portal
           </p>
 
         </div>
@@ -96,7 +96,7 @@ export default function PartnerLogin() {
             </h2>
 
             <p className="text-sm text-slate-500 mt-2">
-              Sign in to your partner account
+              Sign in to your influencer account
             </p>
 
           </div>
@@ -187,7 +187,7 @@ export default function PartnerLogin() {
 
             <p className="text-sm text-slate-500">
 
-              Don't have a partner account?{" "}
+              Don't have an influencer account?{" "}
 
               <Link
                 to="/partner/register"

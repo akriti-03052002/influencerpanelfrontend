@@ -9,12 +9,11 @@ import Button from "../../components/ui/Button";
 import { Select, Input } from "../../components/ui/Input";
 
 const STATUSES = ["", "draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"];
-const PARTNER_TYPES = ["vendor", "affiliate", "referral", "agency", "technology", "strategic", "influencer"];
 
 // Only the fields needed to invite someone in — business name, legal
 // details, address, KYC docs and bank all get filled in later by the
 // partner themselves from their Profile page.
-const EMPTY_FORM = { partnerType: "vendor", contactName: "", email: "", phone: "", password: "" };
+const EMPTY_FORM = { contactName: "", email: "", phone: "", password: "" };
 
 export default function AdminPartners() {
   const [partners, setPartners] = useState([]);
@@ -50,7 +49,7 @@ export default function AdminPartners() {
       setShowForm(false);
       load();
     } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong creating the partner.");
+      setError(err.response?.data?.message || "Something went wrong creating the influencer.");
     } finally {
       setSubmitting(false);
     }
@@ -59,9 +58,9 @@ export default function AdminPartners() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-slate-900">Partners</h1>
+        <h1 className="text-2xl font-bold text-slate-900">Influencers</h1>
         <Button onClick={() => setShowForm((v) => !v)}>
-          <span className="flex items-center gap-2"><Plus size={16} /> Create Partner</span>
+          <span className="flex items-center gap-2"><Plus size={16} /> Create Influencer</span>
         </Button>
       </div>
 
@@ -78,13 +77,10 @@ export default function AdminPartners() {
         <Card className="p-6">
           {error && <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
           <p className="text-sm text-slate-500 mb-4">
-            Set a login password for the partner yourself — they log in with this email and password directly, no activation link. Business details, address and KYC come later from their Profile.
+            Set a login password for the influencer yourself — they log in with this email and password directly, no activation link. Business details, address and KYC come later from their Profile.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Select label="Partner Type" name="partnerType" value={form.partnerType} onChange={handleChange}>
-                {PARTNER_TYPES.map((t) => <option key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</option>)}
-              </Select>
               <Input label="Full Name *" name="contactName" value={form.contactName} onChange={handleChange} required />
               <Input label="Email *" type="email" name="email" value={form.email} onChange={handleChange} required />
               <Input label="Phone *" name="phone" value={form.phone} onChange={handleChange} required />
@@ -92,7 +88,7 @@ export default function AdminPartners() {
             </div>
 
             <div className="flex justify-end">
-              <Button type="submit" loading={submitting}>Create Partner</Button>
+              <Button type="submit" loading={submitting}>Create Influencer</Button>
             </div>
           </form>
         </Card>
@@ -110,7 +106,7 @@ export default function AdminPartners() {
           <p className="text-slate-400 text-sm p-6">Loading...</p>
         ) : (
           <Table
-            empty="No partners found."
+            empty="No influencers found."
             rows={partners}
             columns={[
               { key: "code", header: "Code", render: (p) => p.partnerCode },

@@ -9,14 +9,14 @@ import { useAdminAuth } from "../context/AdminAuthContext";
 
 const NAV_ITEMS = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/partners", label: "Partners", icon: Building2 },
+  { to: "/admin/partners", label: "Influencers", icon: Building2 },
   { to: "/admin/documents", label: "KYC Review", icon: FileCheck },
   { to: "/admin/bank", label: "Bank Review", icon: Landmark },
   {
     label: "Social Media",
     icon: Share2,
     children: [
-      { to: "/admin/social-media", label: "Influencers" }
+      { to: "/admin/social-media", label: "Accounts & Posts" }
     ]
   },
   { to: "/admin/settlements", label: "Settlements", icon: Landmark }

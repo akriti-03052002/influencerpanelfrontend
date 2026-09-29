@@ -310,7 +310,7 @@ export default function AdminSettlements() {
             secondary={money(pendingApproval.amount)}
           />
           <div className="pt-4 lg:pt-0 lg:pl-6">
-            <p className="text-sm text-slate-500 underline decoration-slate-300 underline-offset-4">Total Owed to Partners</p>
+            <p className="text-sm text-slate-500 underline decoration-slate-300 underline-offset-4">Total Owed to Influencers</p>
             <p className="text-3xl font-bold text-slate-900 mt-2">{money(totalOwed)}</p>
           </div>
         </div>
@@ -320,8 +320,8 @@ export default function AdminSettlements() {
         <Card className="p-6 space-y-4">
           {error && <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}
 
-          <Select label="Partner" value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
-            <option value="">Select a partner</option>
+          <Select label="Influencer" value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
+            <option value="">Select an influencer</option>
             {partners.map((p) => <option key={p._id} value={p._id}>{p.legalEntity.businessName || `${p.partnerCode} (incomplete profile)`}</option>)}
           </Select>
 
@@ -329,7 +329,7 @@ export default function AdminSettlements() {
             <div>
               <p className="text-sm font-medium text-slate-700 mb-2">Approved commissions available</p>
               {approvedCommissions.length === 0 ? (
-                <p className="text-sm text-slate-400">No approved commissions for this partner.</p>
+                <p className="text-sm text-slate-400">No approved payments for this influencer.</p>
               ) : (
                 <div className="space-y-2">
                   {approvedCommissions.map((c) => (
@@ -359,7 +359,7 @@ export default function AdminSettlements() {
 
           <div className="flex items-center gap-2">
             <Select value={vendorFilter} onChange={(e) => setVendorFilter(e.target.value)} className="w-56">
-              <option value="">All partners</option>
+              <option value="">All influencers</option>
               {vendors.map((v) => (
                 <option key={v._id} value={v._id}>{v.legalEntity.businessName} ({v.partnerCode})</option>
               ))}
@@ -404,7 +404,7 @@ export default function AdminSettlements() {
                 },
                 {
                   key: "partner",
-                  header: "Partner",
+                  header: "Influencer",
                   render: (s) => (
                     <div className="flex flex-col gap-0.5">
                       <span>{s.partnerId?.legalEntity?.businessName || s.partnerId?.partnerCode || "—"}</span>
@@ -730,7 +730,7 @@ function SettlementDetailPanel({ settlement, bill, history, billActionError, onV
                 {gstAmount > 0 && (
                   <div className="flex justify-between"><span className="text-slate-500">+ GST ({bill.amount.gstRatePercent}%, per verified bill)</span><span className="text-emerald-600">+ {money(gstAmount, settlement.amount.currency)}</span></div>
                 )}
-                <div className="flex justify-between pt-2 border-t border-slate-100 font-semibold"><span className="text-slate-900">Payable to Partner</span><span className="text-slate-900">{money(payable, settlement.amount.currency)}</span></div>
+                <div className="flex justify-between pt-2 border-t border-slate-100 font-semibold"><span className="text-slate-900">Payable to Influencer</span><span className="text-slate-900">{money(payable, settlement.amount.currency)}</span></div>
               </div>
             </div>
 
@@ -771,7 +771,7 @@ function SettlementDetailPanel({ settlement, bill, history, billActionError, onV
                   <div className="flex justify-between"><span className="text-slate-500">IFSC</span><span className="text-slate-900">{settlement.bankAccount.ifscMasked || "—"}</span></div>
                 </div>
               ) : (
-                <p className="text-sm text-slate-400">No bank account on file for this partner.</p>
+                <p className="text-sm text-slate-400">No bank account on file for this influencer.</p>
               )}
             </div>
 

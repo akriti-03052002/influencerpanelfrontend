@@ -34,7 +34,7 @@ export default function Landing() {
 
       <section className="max-w-4xl mx-auto px-6 pt-24 pb-20 text-center">
         <span className="inline-block px-3 py-1 rounded-full bg-brand-red/10 text-brand-red text-xs font-semibold tracking-wide uppercase mb-6">
-          SPOTX Influencer Partner Panel
+          SPOTX Influencer Panel
         </span>
         <h1 className="font-heading text-4xl sm:text-5xl font-extrabold text-brand-black tracking-tight leading-tight">
           Grow with SPOTX through your influence
@@ -48,7 +48,7 @@ export default function Landing() {
             to="/partner/register"
             className="inline-flex items-center justify-center gap-2 bg-brand-black text-white px-8 py-3.5 rounded-xl font-semibold hover:bg-charcoal transition"
           >
-            Become an Influencer Partner
+            Become a SPOTX Influencer
             <ArrowRight size={18} />
           </Link>
         </div>
@@ -72,13 +72,13 @@ export default function Landing() {
         <Megaphone className="mx-auto text-brand-red mb-4" size={30} />
         <h2 className="font-heading text-2xl font-bold text-brand-black">A partnership built for creators</h2>
         <p className="text-slate-500 mt-3">
-          No partner tiers or program selection.
+          No tiers or complicated programs.
           Just the tools influencers need to promote SPOTX and get paid.
         </p>
       </section>
 
       <footer className="max-w-6xl mx-auto px-6 py-8 text-center">
-        <p className="text-xs text-slate-400">© {new Date().getFullYear()} SPOTX. Influencer Partner Panel.</p>
+        <p className="text-xs text-slate-400">© {new Date().getFullYear()} SPOTX. Influencer Panel.</p>
       </footer>
     </div>
   );

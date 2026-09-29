@@ -13,6 +13,8 @@ export default function AdminSocialMedia() {
   const [reasons, setReasons] = useState({});
   const [notes, setNotes] = useState({});
   const [ownership, setOwnership] = useState({});
+  // Ids whose Reject was clicked without a reason — their reason box turns red.
+  const [missingReason, setMissingReason] = useState({});
   const [rates, setRates] = useState({});
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState("");
@@ -28,17 +30,21 @@ export default function AdminSocialMedia() {
     setSubmissions(submissionResponse.data.data);
   };
 
+  // Each social account has its own price (reach differs per platform).
+  // An empty box means that content type isn't paid for this account.
+  const rateValue = (account, type) => rates[account._id]?.[type] ?? (account.paymentRates?.[type] || "");
+
   const saveRates = async (account) => {
-    setBusyId(`rates-${account.partnerId}`);
+    setBusyId(`rates-${account._id}`);
     setError("");
     setMessage("");
     try {
-      await adminApi.patch(`/admin/social-media/accounts/${account.partnerId}/rates`, {
-        post: Number(rates[account.partnerId]?.post ?? account.paymentRates?.post),
-        reel: Number(rates[account.partnerId]?.reel ?? account.paymentRates?.reel),
-        currency: rates[account.partnerId]?.currency || account.paymentRates?.currency || "INR"
+      const response = await adminApi.patch(`/admin/social-media/accounts/${account.partnerId}/${account._id}/rates`, {
+        post: rateValue(account, "post"),
+        reel: rateValue(account, "reel"),
+        currency: account.paymentRates?.currency || "INR"
       });
-      setMessage("Influencer payment rates updated.");
+      setMessage(`${account.username || account.accountId} (${formatPlatform(account.platform)}): ${response.data.message}`);
       await load();
     } catch (saveError) {
       setError(saveError.response?.data?.message || "Couldn't update payment rates.");
@@ -53,7 +59,17 @@ export default function AdminSocialMedia() {
       .finally(() => setLoading(false));
   }, []);
 
+  // The reason is shown to the influencer, so rejecting needs one. Instead of a
+  // dead button, flag the box and put the cursor in it.
+  const needsReason = (id, text) => {
+    if (text?.trim()) return false;
+    setMissingReason((current) => ({ ...current, [id]: true }));
+    document.getElementById(`reason-${id}`)?.focus();
+    return true;
+  };
+
   const reviewAccount = async (account, decision) => {
+    if (decision === "rejected" && needsReason(account._id, reasons[account._id])) return;
     setBusyId(account._id);
     setError("");
     setMessage("");
@@ -72,6 +88,7 @@ export default function AdminSocialMedia() {
   };
 
   const reviewSubmission = async (submission, decision) => {
+    if (decision === "rejected" && needsReason(submission._id, notes[submission._id])) return;
     setBusyId(submission._id);
     setError("");
     setMessage("");
@@ -118,29 +135,38 @@ export default function AdminSocialMedia() {
                     <p className="mt-2 text-sm text-slate-700">{formatPlatform(account.platform)} · {account.username || account.accountId} · {Number(account.followers || 0).toLocaleString()} followers/subscribers</p>
                     <p className="text-xs text-slate-400 mt-1">Account ID / handle: {account.accountId}</p>
                     {account.rejectionReason && <p className="text-xs text-red-600 mt-1">Previous rejection: {account.rejectionReason}</p>}
-                    <div className="mt-3 flex flex-wrap items-end gap-2">
+                    <p className="mt-3 text-xs font-medium text-slate-500">Pay for content from this {formatPlatform(account.platform)} account</p>
+                    <div className="mt-1 flex flex-wrap items-end gap-2">
                       <label className="text-xs text-slate-500">Post ₹
-                        <input type="number" min="0.01" step="0.01" value={rates[account.partnerId]?.post ?? account.paymentRates?.post ?? ""} onChange={(event) => setRates({ ...rates, [account.partnerId]: { ...(rates[account.partnerId] || {}), post: event.target.value } })} className="ml-1 w-28 px-2 py-1.5 border border-slate-200 rounded-lg" />
+                        <input type="number" min="0" step="0.01" placeholder="Not paid" value={rateValue(account, "post")} onChange={(event) => setRates({ ...rates, [account._id]: { ...(rates[account._id] || {}), post: event.target.value } })} className="ml-1 w-28 px-2 py-1.5 border border-slate-200 rounded-lg" />
                       </label>
                       <label className="text-xs text-slate-500">Reel ₹
-                        <input type="number" min="0.01" step="0.01" value={rates[account.partnerId]?.reel ?? account.paymentRates?.reel ?? ""} onChange={(event) => setRates({ ...rates, [account.partnerId]: { ...(rates[account.partnerId] || {}), reel: event.target.value } })} className="ml-1 w-28 px-2 py-1.5 border border-slate-200 rounded-lg" />
+                        <input type="number" min="0" step="0.01" placeholder="Not paid" value={rateValue(account, "reel")} onChange={(event) => setRates({ ...rates, [account._id]: { ...(rates[account._id] || {}), reel: event.target.value } })} className="ml-1 w-28 px-2 py-1.5 border border-slate-200 rounded-lg" />
                       </label>
-                      <Button type="button" loading={busyId === `rates-${account.partnerId}`} onClick={() => saveRates(account)}>Save rates</Button>
+                      <Button type="button" loading={busyId === `rates-${account._id}`} onClick={() => saveRates(account)}>Save rates</Button>
                     </div>
                   </div>
                   <Badge status={account.reviewStatus} />
                 </div>
                 {account.reviewStatus === "pending" && (
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input
-                      aria-label={`Rejection reason for ${account.username || account.accountId}`}
-                      value={reasons[account._id] || ""}
-                      onChange={(event) => setReasons({ ...reasons, [account._id]: event.target.value })}
-                      placeholder="Reason required if rejecting"
-                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm"
-                    />
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-2">
+                    <div className="flex-1">
+                      <input
+                        id={`reason-${account._id}`}
+                        aria-label={`Rejection reason for ${account.username || account.accountId}`}
+                        aria-invalid={Boolean(missingReason[account._id])}
+                        value={reasons[account._id] || ""}
+                        onChange={(event) => {
+                          setReasons({ ...reasons, [account._id]: event.target.value });
+                          setMissingReason({ ...missingReason, [account._id]: false });
+                        }}
+                        placeholder="Reason for rejecting (shown to the influencer)"
+                        className={`w-full px-3 py-2 border rounded-lg text-sm ${missingReason[account._id] ? "border-red-400 bg-red-50" : "border-slate-200"}`}
+                      />
+                      {missingReason[account._id] && <p className="text-xs text-red-600 mt-1">Type a reason first — the influencer will see it.</p>}
+                    </div>
                     <Button type="button" loading={busyId === account._id} onClick={() => reviewAccount(account, "verified")}>Verify account</Button>
-                    <Button type="button" variant="danger" disabled={!reasons[account._id]?.trim()} loading={busyId === account._id} onClick={() => reviewAccount(account, "rejected")}>Reject</Button>
+                    <Button type="button" variant="danger" loading={busyId === account._id} onClick={() => reviewAccount(account, "rejected")}>Reject</Button>
                   </div>
                 )}
               </div>
@@ -176,16 +202,24 @@ export default function AdminSocialMedia() {
                       <input type="checkbox" checked={Boolean(ownership[submission._id])} onChange={(event) => setOwnership({ ...ownership, [submission._id]: event.target.checked })} />
                       I verified URL ownership against the influencer account
                     </label>
-                    <input
-                      aria-label={`Review note for ${submission.url}`}
-                      value={notes[submission._id] || ""}
-                      onChange={(event) => setNotes({ ...notes, [submission._id]: event.target.value })}
-                      placeholder="Rejection reason (required if rejecting)"
-                      className="px-3 py-2 border border-slate-200 rounded-lg text-sm"
-                    />
+                    <div>
+                      <input
+                        id={`reason-${submission._id}`}
+                        aria-label={`Review note for ${submission.url}`}
+                        aria-invalid={Boolean(missingReason[submission._id])}
+                        value={notes[submission._id] || ""}
+                        onChange={(event) => {
+                          setNotes({ ...notes, [submission._id]: event.target.value });
+                          setMissingReason({ ...missingReason, [submission._id]: false });
+                        }}
+                        placeholder="Reason for rejecting (shown to the influencer)"
+                        className={`w-full px-3 py-2 border rounded-lg text-sm ${missingReason[submission._id] ? "border-red-400 bg-red-50" : "border-slate-200"}`}
+                      />
+                      {missingReason[submission._id] && <p className="text-xs text-red-600 mt-1">Type a reason first — the influencer will see it.</p>}
+                    </div>
                     <div className="flex gap-2">
                       <Button type="button" disabled={!ownership[submission._id]} loading={busyId === submission._id} onClick={() => reviewSubmission(submission, "approved")}>Approve & assign payment</Button>
-                      <Button type="button" variant="danger" disabled={!notes[submission._id]?.trim()} loading={busyId === submission._id} onClick={() => reviewSubmission(submission, "rejected")}>Reject</Button>
+                      <Button type="button" variant="danger" loading={busyId === submission._id} onClick={() => reviewSubmission(submission, "rejected")}>Reject</Button>
                     </div>
                   </div>
                 )}

@@ -29,7 +29,7 @@ export default function Dashboard() {
         <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
         <div className="flex gap-4 flex-wrap">
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-medium text-slate-400">Partner Status</span>
+            <span className="text-xs font-medium text-slate-400">Account Status</span>
             <Badge status={partnerStatus} />
           </div>
           <div className="flex items-center gap-1.5">

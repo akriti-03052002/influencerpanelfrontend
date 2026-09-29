@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link to="/admin/partners"><StatCard label="Pending Partner Verification" value={counts.pendingPartners} icon={Building2} tone="brand" /></Link>
+        <Link to="/admin/partners"><StatCard label="Pending Influencer Verification" value={counts.pendingPartners} icon={Building2} tone="brand" /></Link>
         <Link to="/admin/documents"><StatCard label="Pending KYC Documents" value={counts.pendingDocuments} icon={FileCheck} /></Link>
         <Link to="/admin/bank"><StatCard label="Pending Bank Verification" value={counts.pendingBank} icon={Landmark} /></Link>
         <Link to="/admin/commissions"><StatCard label="Pending Commission Approvals" value={counts.pendingCommissions} icon={Wallet} /></Link>
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
           <h2 className="font-semibold text-slate-900 mb-3">Verification Totals</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <BreakdownCard
-              title="Partners"
+              title="Influencers"
               data={kpis.partnersByStatus}
               order={["draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"]}
             />
