@@ -33,7 +33,6 @@ import AdminPartnerDetail from "./pages/admin/AdminPartnerDetail";
 import AdminDocuments from "./pages/admin/AdminDocuments";
 import AdminBank from "./pages/admin/AdminBank";
 import AdminSettlements from "./pages/admin/AdminSettlements";
-import AdminConfig from "./pages/admin/AdminConfig";
 import AdminSocialMedia from "./pages/admin/AdminSocialMedia";
 
 // ======================================================
@@ -109,7 +108,6 @@ function App() {
               <Route path="documents" element={<AdminDocuments />} />
               <Route path="bank" element={<AdminBank />} />
               <Route path="settlements" element={<AdminSettlements />} />
-              <Route path="config" element={<AdminConfig />} />
               <Route path="social-media" element={<AdminSocialMedia />} />
             </Route>
 

@@ -4,19 +4,10 @@ import adminApi from "../../services/adminApi";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
-import { Select, Input } from "../../components/ui/Input";
+import { Select } from "../../components/ui/Input";
 import DocumentPreviewModal from "../../components/admin/DocumentPreviewModal";
 import BankAccountPreviewModal from "../../components/admin/BankAccountPreviewModal";
-import { UploadCloud, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
-
-const COMMISSION_TYPE_OPTIONS = [
-  { value: "percentage", label: "Percentage of deal value" },
-  { value: "recurring_percentage", label: "Recurring percentage" },
-  { value: "fixed_per_deal", label: "Fixed amount per deal" },
-  { value: "recurring_fixed", label: "Recurring fixed amount" },
-  { value: "fixed_per_screen", label: "Fixed amount per screen" },
-  { value: "hybrid", label: "Hybrid (% + fixed + per-screen)" }
-];
+import { UploadCloud, FileText, AlertCircle } from "lucide-react";
 
 const STATUS_OPTIONS = ["draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"];
 
@@ -48,13 +39,6 @@ export default function AdminPartnerDetail() {
   const [uploadingType, setUploadingType] = useState(null);
   const [uploadErrors, setUploadErrors] = useState({}); // { [documentType]: message }
 
-  const [commission, setCommission] = useState(null); // { active, history }
-  const [commissionForm, setCommissionForm] = useState({
-    commissionType: "percentage", rate: "", fixedAmount: "", perScreenAmount: "", notes: ""
-  });
-  const [commissionBusy, setCommissionBusy] = useState(false);
-  const [commissionError, setCommissionError] = useState("");
-  const [commissionSuccess, setCommissionSuccess] = useState("");
 
   const load = () => {
     adminApi.get(`/admin/partners/${id}`).then((res) => {
@@ -63,50 +47,9 @@ export default function AdminPartnerDetail() {
     });
   };
 
-  const loadCommission = () => adminApi.get(`/admin/partners/${id}/commission-assignment`).then((res) => setCommission(res.data.data));
-
   useEffect(() => {
     load();
-    loadCommission();
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const applyCommission = async () => {
-    setCommissionError("");
-    setCommissionSuccess("");
-
-    const { commissionType, rate, fixedAmount, perScreenAmount, notes } = commissionForm;
-    if (commissionType.includes("percentage") && !rate) {
-      setCommissionError("Enter a percentage rate.");
-      return;
-    }
-    if ((commissionType === "fixed_per_deal" || commissionType === "recurring_fixed") && !fixedAmount) {
-      setCommissionError("Enter a fixed amount.");
-      return;
-    }
-    if (commissionType === "fixed_per_screen" && !perScreenAmount) {
-      setCommissionError("Enter a per-screen amount.");
-      return;
-    }
-
-    setCommissionBusy(true);
-    try {
-      const res = await adminApi.post(`/admin/partners/${id}/commission-assignment`, {
-        commissionType,
-        rate: Number(rate) || 0,
-        fixedAmount: Number(fixedAmount) || 0,
-        perScreenAmount: Number(perScreenAmount) || 0,
-        notes
-      });
-      setCommissionSuccess(`Agreement ${res.data.data.acceptance.agreementRef} issued and accepted.`);
-      setCommissionForm((f) => ({ ...f, notes: "" }));
-      loadCommission();
-      load();
-    } catch (err) {
-      setCommissionError(err.response?.data?.message || "Something went wrong assigning commission.");
-    } finally {
-      setCommissionBusy(false);
-    }
-  };
 
   const applyStatus = async () => {
     let rejectionReason;
@@ -211,79 +154,6 @@ export default function AdminPartnerDetail() {
           </div>
         </Card>
 
-        {partner.partnerType === "vendor" && (
-          <Card className="p-6">
-            <h2 className="font-semibold text-slate-900 mb-4">Commission</h2>
-
-            {commission?.active && (
-              <div className="flex items-start gap-2 text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-2.5 mb-3">
-                <CheckCircle2 size={14} className="shrink-0 mt-0.5" />
-                <span>
-                  Active: {COMMISSION_TYPE_OPTIONS.find((o) => o.value === commission.active.commissionType)?.label || commission.active.commissionType}
-                  {commission.active.rate ? ` · ${commission.active.rate}%` : ""}
-                  {commission.active.fixedAmount ? ` · ₹${commission.active.fixedAmount}` : ""}
-                  {commission.active.perScreenAmount ? ` · ₹${commission.active.perScreenAmount}/screen` : ""}
-                  {" — agreement auto-accepted."}
-                </span>
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <Select
-                label="Commission type"
-                value={commissionForm.commissionType}
-                onChange={(e) => setCommissionForm((f) => ({ ...f, commissionType: e.target.value }))}
-              >
-                {COMMISSION_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </Select>
-
-              {commissionForm.commissionType.includes("percentage") && (
-                <Input
-                  label="Rate (%)"
-                  type="number"
-                  value={commissionForm.rate}
-                  onChange={(e) => setCommissionForm((f) => ({ ...f, rate: e.target.value }))}
-                  placeholder="e.g. 15"
-                />
-              )}
-              {(commissionForm.commissionType === "fixed_per_deal" || commissionForm.commissionType === "recurring_fixed") && (
-                <Input
-                  label="Fixed amount per deal (₹)"
-                  type="number"
-                  value={commissionForm.fixedAmount}
-                  onChange={(e) => setCommissionForm((f) => ({ ...f, fixedAmount: e.target.value }))}
-                  placeholder="e.g. 10000"
-                />
-              )}
-              {commissionForm.commissionType === "fixed_per_screen" && (
-                <Input
-                  label="Amount per screen (₹)"
-                  type="number"
-                  value={commissionForm.perScreenAmount}
-                  onChange={(e) => setCommissionForm((f) => ({ ...f, perScreenAmount: e.target.value }))}
-                  placeholder="e.g. 500"
-                />
-              )}
-              {commissionForm.commissionType === "hybrid" && (
-                <div className="grid grid-cols-3 gap-2">
-                  <Input label="% rate" type="number" value={commissionForm.rate} onChange={(e) => setCommissionForm((f) => ({ ...f, rate: e.target.value }))} />
-                  <Input label="Fixed ₹" type="number" value={commissionForm.fixedAmount} onChange={(e) => setCommissionForm((f) => ({ ...f, fixedAmount: e.target.value }))} />
-                  <Input label="₹/screen" type="number" value={commissionForm.perScreenAmount} onChange={(e) => setCommissionForm((f) => ({ ...f, perScreenAmount: e.target.value }))} />
-                </div>
-              )}
-
-              {commissionError && <p className="text-xs text-red-600">{commissionError}</p>}
-              {commissionSuccess && <p className="text-xs text-emerald-600">{commissionSuccess}</p>}
-
-              <Button onClick={applyCommission} loading={commissionBusy}>
-                {commission?.active ? "Update commission & reissue agreement" : "Assign commission & issue agreement"}
-              </Button>
-              <p className="text-xs text-slate-400">
-                Setting this generates the Partner Agreement immediately and marks it automatically accepted by the partner — no separate sign-off step.
-              </p>
-            </div>
-          </Card>
-        )}
       </div>
 
 
@@ -340,9 +210,7 @@ export default function AdminPartnerDetail() {
                 {type.systemGenerated ? (
                   !doc && (
                     <p className="text-xs text-slate-400">
-                      {partner.partnerType === "vendor"
-                        ? "Generated once a commission is assigned above — nothing to upload here."
-                        : "Generated automatically once the partner is verified — nothing to upload here."}
+                      Generated automatically once the partner is verified — nothing to upload here.
                     </p>
                   )
                 ) : hideUpload ? (
