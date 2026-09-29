@@ -72,7 +72,7 @@ export default function Landing() {
         <Megaphone className="mx-auto text-brand-red mb-4" size={30} />
         <h2 className="font-heading text-2xl font-bold text-brand-black">A partnership built for creators</h2>
         <p className="text-slate-500 mt-3">
-          No reseller inventory, partner tiers, or program selection.
+          No partner tiers or program selection.
           Just the tools influencers need to promote SPOTX and get paid.
         </p>
       </section>

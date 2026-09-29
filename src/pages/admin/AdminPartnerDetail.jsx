@@ -211,14 +211,6 @@ export default function AdminPartnerDetail() {
           </div>
         </Card>
 
-        {partner.partnerType === "reseller" && (
-          <Card className="p-6 md:col-span-2">
-            <p className="text-sm text-slate-500">
-              This is a Reseller partner — no commission applies. See the Reseller section below for inventory, pricing, and billing controls.
-            </p>
-          </Card>
-        )}
-
         {partner.partnerType === "vendor" && (
           <Card className="p-6">
             <h2 className="font-semibold text-slate-900 mb-4">Commission</h2>

@@ -8,7 +8,7 @@ import Logo from "../../components/ui/Logo";
 
 // `required` is resolved per-partnerType from the backend (see
 // partnerVerification.js) once profile data loads — business types
-// (Vendor, Reseller, Agency, Technology, Strategic) need GST/MSME on top
+// (Vendor, Agency, Technology, Strategic) need GST/MSME on top
 // of PAN + a cheque; individual-oriented types (Affiliate, Influencer,
 // Referral) only need the latter two.
 const DOCUMENT_TYPES = [

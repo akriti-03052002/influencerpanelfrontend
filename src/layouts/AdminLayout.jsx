@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, FileCheck, Landmark,
-  SlidersHorizontal, Wallet, LogOut, Menu, X, PackageSearch, Share2
+  SlidersHorizontal, Wallet, LogOut, Menu, X, Share2
 } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import { useAdminAuth } from "../context/AdminAuthContext";
@@ -20,7 +20,6 @@ const NAV_ITEMS = [
     ]
   },
   { to: "/admin/settlements", label: "Settlements", icon: Landmark },
-  { to: "/admin/reseller", label: "Reseller", icon: PackageSearch },
   { to: "/admin/config", label: "Commission Rules", icon: SlidersHorizontal }
 ];
 

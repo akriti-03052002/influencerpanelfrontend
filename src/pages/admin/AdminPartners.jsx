@@ -9,7 +9,7 @@ import Button from "../../components/ui/Button";
 import { Select, Input } from "../../components/ui/Input";
 
 const STATUSES = ["", "draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"];
-const PARTNER_TYPES = ["vendor", "affiliate", "referral", "agency", "reseller", "technology", "strategic", "influencer"];
+const PARTNER_TYPES = ["vendor", "affiliate", "referral", "agency", "technology", "strategic", "influencer"];
 
 // Only the fields needed to invite someone in — business name, legal
 // details, address, KYC docs and bank all get filled in later by the
