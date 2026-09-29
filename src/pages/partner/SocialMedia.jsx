@@ -5,11 +5,11 @@ import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
 import { Input, Select } from "../../components/ui/Input";
-import SocialConnectCard, { InstagramLogo, FacebookLogo } from "../../components/partner/SocialConnectCard";
+import SocialConnectCard, { InstagramLogo, FacebookLogo, YouTubeLogo } from "../../components/partner/SocialConnectCard";
 
 const PLATFORMS = ["instagram", "youtube", "facebook"];
-const CONNECTABLE = ["instagram", "facebook"];
-const PLATFORM_ICON = { instagram: InstagramLogo, facebook: FacebookLogo };
+const CONNECTABLE = ["instagram", "facebook", "youtube"];
+const PLATFORM_ICON = { instagram: InstagramLogo, facebook: FacebookLogo, youtube: YouTubeLogo };
 
 const capitalize = (value) => (value ? value[0].toUpperCase() + value.slice(1) : "");
 
@@ -22,7 +22,7 @@ const readOauthResult = () => {
 export default function SocialMedia() {
   const [oauthResult] = useState(readOauthResult);
   const [accounts, setAccounts] = useState([]);
-  const [form, setForm] = useState({ platform: "youtube", accountId: "", followers: "" });
+  const [form, setForm] = useState({ platform: "instagram", accountId: "", followers: "" });
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [connecting, setConnecting] = useState(null);
@@ -121,7 +121,7 @@ export default function SocialMedia() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
         {CONNECTABLE.map((platform) => {
           const account = connectedAccount(platform);
           return (
@@ -149,7 +149,7 @@ export default function SocialMedia() {
           <span className="h-9 w-9 rounded-lg bg-slate-100 text-slate-500 grid place-items-center"><PenLine size={16} /></span>
           <span className="flex-1">
             <span className="block font-semibold text-slate-900">Add an account manually</span>
-            <span className="block text-xs text-slate-500">For YouTube, or if you can't connect above. An admin will verify it by hand.</span>
+            <span className="block text-xs text-slate-500">Only if you can't connect above. An admin will verify it by hand.</span>
           </span>
           <ChevronDown size={18} className={`text-slate-400 transition ${showManual ? "rotate-180" : ""}`} />
         </button>
@@ -190,7 +190,7 @@ export default function SocialMedia() {
         {loading ? <p className="p-6 text-sm text-slate-400">Loading accounts...</p> : accounts.length === 0 ? (
           <div className="p-8 text-center text-sm text-slate-500">
             <Share2 size={24} className="mx-auto mb-2 text-slate-300" />
-            No accounts yet — connect Instagram or Facebook above to get started.
+            No accounts yet — connect Instagram, Facebook or YouTube above to get started.
           </div>
         ) : (
           <div className="divide-y divide-slate-100">

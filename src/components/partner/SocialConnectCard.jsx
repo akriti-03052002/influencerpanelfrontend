@@ -20,6 +20,14 @@ export function FacebookLogo({ size = 24 }) {
   );
 }
 
+export function YouTubeLogo({ size = 24 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" />
+    </svg>
+  );
+}
+
 const BRANDS = {
   instagram: {
     name: "Instagram",
@@ -40,6 +48,17 @@ const BRANDS = {
     avatar: "bg-[#1877F2]",
     blurb: "Facebook Page you manage",
     reads: "your Page name and follower count"
+  },
+  youtube: {
+    name: "YouTube",
+    Logo: YouTubeLogo,
+    tile: "bg-[#FF0000]",
+    button: "bg-[#FF0000] hover:bg-[#E60000]",
+    ring: "ring-[#FF0000]/25",
+    avatar: "bg-[#FF0000]",
+    blurb: "Your YouTube channel",
+    reads: "your channel name and subscriber count",
+    audience: "subscribers"
   }
 };
 
@@ -96,7 +115,7 @@ export default function SocialConnectCard({ platform, account, needsReconnect, c
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-slate-900 leading-none">{formatCount(account.followers)}</p>
-              <p className="text-xs text-slate-500 mt-1">followers</p>
+              <p className="text-xs text-slate-500 mt-1">{brand.audience || "followers"}</p>
             </div>
           </div>
 
@@ -129,11 +148,11 @@ export default function SocialConnectCard({ platform, account, needsReconnect, c
           {needsReconnect ? (
             <p className="mt-4 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
               <AlertTriangle size={14} className="shrink-0 mt-0.5" />
-              Your {brand.name} connection stopped working. Reconnect to keep your follower count updating.
+              Your {brand.name} connection stopped working. Reconnect to keep your {brand.audience === "subscribers" ? "subscriber" : "follower"} count updating.
             </p>
           ) : (
             <p className="mt-4 text-sm text-slate-500">
-              Log in once — we'll keep your follower count up to date automatically.
+              Log in once — we'll keep your {brand.audience === "subscribers" ? "subscriber" : "follower"} count up to date automatically.
             </p>
           )}
 
