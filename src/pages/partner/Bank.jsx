@@ -62,8 +62,7 @@ export default function Bank() {
   // server-created ₹1 order, then hands the result to /verify/confirm.
   // Nothing here is trusted on its own — the backend independently
   // re-verifies the signature and re-fetches the payment from Razorpay
-  // before recording anything (mirrors the customer subscription checkout
-  // in pages/customer/Subscription.jsx).
+  // before recording anything.
   const startVerification = async () => {
     setVerifyError("");
     setVerifying(true);

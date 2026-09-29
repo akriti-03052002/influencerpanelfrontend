@@ -5,7 +5,7 @@ import api from "../../services/api";
 import Card from "../ui/Card";
 
 // Wraps any route that presumes a fully-verified partner (commissions,
-// settlements, team, customers). Always
+// settlements, team). Always
 // re-checks against the server instead of trusting the partner snapshot
 // cached at login, since verification can complete mid-session.
 export default function VerifiedGate({ children }) {

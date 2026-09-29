@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, FileCheck, Landmark,
-  SlidersHorizontal, Wallet, LogOut, Menu, X, Users, PackageSearch, Share2
+  SlidersHorizontal, Wallet, LogOut, Menu, X, PackageSearch, Share2
 } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import { useAdminAuth } from "../context/AdminAuthContext";
@@ -10,7 +10,6 @@ import { useAdminAuth } from "../context/AdminAuthContext";
 const NAV_ITEMS = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/partners", label: "Partners", icon: Building2 },
-  { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/documents", label: "KYC Review", icon: FileCheck },
   { to: "/admin/bank", label: "Bank Review", icon: Landmark },
   {
@@ -22,7 +21,7 @@ const NAV_ITEMS = [
   },
   { to: "/admin/settlements", label: "Settlements", icon: Landmark },
   { to: "/admin/reseller", label: "Reseller", icon: PackageSearch },
-  { to: "/admin/config", label: "Commission & Pricing", icon: SlidersHorizontal }
+  { to: "/admin/config", label: "Commission Rules", icon: SlidersHorizontal }
 ];
 
 export default function AdminLayout() {

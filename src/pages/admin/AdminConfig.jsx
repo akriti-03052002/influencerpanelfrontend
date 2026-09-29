@@ -6,7 +6,7 @@ import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import { Input, Select } from "../../components/ui/Input";
 
-const TABS = ["Commission Rules", "Screen Pricing"];
+const TABS = ["Commission Rules"];
 const PARTNER_TYPES = ["vendor", "influencer", "affiliate", "referral", "agency", "reseller", "technology", "strategic"];
 
 const COMMISSION_TYPE_OPTIONS = ["percentage", "fixed_per_deal", "fixed_per_screen", "recurring_percentage", "recurring_fixed", "hybrid", "wholesale_discount"];
@@ -196,60 +196,12 @@ function CommissionRulesTab() {
   );
 }
 
-function ScreenPricingTab() {
-  const [basicPrice, setBasicPrice] = useState("");
-  const [premiumPrice, setPremiumPrice] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [savedMessage, setSavedMessage] = useState("");
-
-  useEffect(() => {
-    adminApi.get("/admin/config/screen-pricing")
-      .then((res) => {
-        setBasicPrice(String(res.data.data.basicPricePerScreen));
-        setPremiumPrice(String(res.data.data.premiumPricePerScreen));
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const submit = async (e) => {
-    e.preventDefault();
-    setSavedMessage("");
-    setSaving(true);
-    try {
-      await adminApi.put("/admin/config/screen-pricing", {
-        basicPricePerScreen: Number(basicPrice),
-        premiumPricePerScreen: Number(premiumPrice)
-      });
-      setSavedMessage("Saved.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) return <p className="text-slate-400 text-sm">Loading...</p>;
-
-  return (
-    <Card className="p-6 max-w-md">
-      <p className="text-sm text-slate-500 mb-4">
-        Global monthly price per screen for each plan, used to calculate the total on a customer's Subscription page.
-      </p>
-      <form onSubmit={submit} className="space-y-4">
-        <Input label="Basic — price per screen / month (₹)" type="number" min={0} value={basicPrice} onChange={(e) => setBasicPrice(e.target.value)} required />
-        <Input label="Premium — price per screen / month (₹)" type="number" min={0} value={premiumPrice} onChange={(e) => setPremiumPrice(e.target.value)} required />
-        <Button type="submit" loading={saving}>Save</Button>
-      </form>
-      {savedMessage && <p className="text-xs text-emerald-600 mt-3">{savedMessage}</p>}
-    </Card>
-  );
-}
-
 export default function AdminConfig() {
   const [tab, setTab] = useState(TABS[0]);
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Commission Rules & Pricing</h1>
+      <h1 className="text-2xl font-bold text-slate-900">Commission Rules</h1>
 
       <div className="flex gap-2 border-b border-slate-200">
         {TABS.map((t) => (
@@ -266,7 +218,6 @@ export default function AdminConfig() {
       </div>
 
       {tab === "Commission Rules" && <CommissionRulesTab />}
-      {tab === "Screen Pricing" && <ScreenPricingTab />}
     </div>
   );
 }

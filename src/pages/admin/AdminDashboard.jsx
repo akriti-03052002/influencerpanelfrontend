@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, FileCheck, Landmark, Wallet, Users, TrendingUp, Banknote } from "lucide-react";
+import { Building2, FileCheck, Landmark, Wallet, Users, UserCheck, Banknote } from "lucide-react";
 import { Link } from "react-router-dom";
 import adminApi from "../../services/adminApi";
 import Card from "../../components/ui/Card";
@@ -50,9 +50,6 @@ export default function AdminDashboard() {
 
   if (!counts) return <p className="text-slate-400 text-sm">Loading...</p>;
 
-  const trialCustomers = kpis?.customersBySubscriptionStatus?.trial || 0;
-  const paidCustomers = kpis?.customersBySubscriptionStatus?.active || 0;
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-slate-900">Admin Dashboard</h1>
@@ -67,10 +64,9 @@ export default function AdminDashboard() {
       {kpis && (
         <Card className="p-6">
           <h2 className="font-semibold text-slate-900 mb-4">Business Overview</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Total Vendors" value={kpis.partnersByType?.vendor || 0} icon={Building2} />
-            <Link to="/admin/customers"><StatCard label="Total Customers" value={kpis.totalCustomers} icon={Users} /></Link>
-            <StatCard label="Trial vs Paid" value={`${trialCustomers} / ${paidCustomers}`} icon={TrendingUp} />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Link to="/admin/partners"><StatCard label="Total Influencers" value={kpis.partnersByType?.influencer || 0} icon={Users} /></Link>
+            <StatCard label="Active Influencers" value={kpis.activePartners} icon={UserCheck} />
             <StatCard label="Total Payouts Paid" value={`₹${kpis.totalPayoutsPaid.toLocaleString()}`} icon={Banknote} />
           </div>
           <p className="text-xs text-slate-400 mt-4">
