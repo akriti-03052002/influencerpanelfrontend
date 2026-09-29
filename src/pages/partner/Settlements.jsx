@@ -512,7 +512,7 @@ function SettlementDetailPanel({ settlement, bill, history, onBillSubmitted, loa
                     <div key={c._id} className="flex items-center justify-between text-sm border border-slate-100 rounded-xl p-3">
                       <div className="flex items-center gap-2 text-slate-600">
                         <Landmark size={14} className="text-slate-400" />
-                        {c.transaction?.invoiceNumber || "—"}
+                        {c.description || c.transaction?.invoiceNumber || "—"}
                       </div>
                       <span className="font-medium text-slate-900">{money(c.calculation?.netCommission, settlement.amount.currency)}</span>
                     </div>

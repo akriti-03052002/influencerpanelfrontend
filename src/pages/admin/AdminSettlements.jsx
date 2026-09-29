@@ -327,7 +327,7 @@ export default function AdminSettlements() {
 
           {partnerId && (
             <div>
-              <p className="text-sm font-medium text-slate-700 mb-2">Approved commissions available</p>
+              <p className="text-sm font-medium text-slate-700 mb-2">Approved payments available</p>
               {approvedCommissions.length === 0 ? (
                 <p className="text-sm text-slate-400">No approved payments for this influencer.</p>
               ) : (
@@ -335,7 +335,9 @@ export default function AdminSettlements() {
                   {approvedCommissions.map((c) => (
                     <label key={c._id} className="flex items-center gap-3 text-sm border border-slate-100 rounded-xl p-3">
                       <input type="checkbox" checked={selectedIds.includes(c._id)} onChange={() => toggleSelect(c._id)} />
-                      ₹{c.calculation.netCommission.toLocaleString()} — earned {new Date(c.createdAt).toLocaleDateString()}
+                      <span className="flex-1">{c.description || "Payment"}</span>
+                      <span className="text-slate-400">{new Date(c.createdAt).toLocaleDateString()}</span>
+                      <span className="font-medium text-slate-900">₹{c.calculation.netCommission.toLocaleString()}</span>
                     </label>
                   ))}
                 </div>
@@ -806,7 +808,7 @@ function SettlementDetailPanel({ settlement, bill, history, billActionError, onV
                     <div key={c._id} className="flex items-center justify-between text-sm border border-slate-100 rounded-xl p-3">
                       <div className="flex items-center gap-2 text-slate-600">
                         <Landmark size={14} className="text-slate-400" />
-                        {c.transaction?.invoiceNumber || "—"}
+                        {c.description || c.transaction?.invoiceNumber || "—"}
                       </div>
                       <span className="font-medium text-slate-900">{money(c.calculation?.netCommission, settlement.amount.currency)}</span>
                     </div>
