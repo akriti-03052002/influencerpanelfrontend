@@ -85,7 +85,7 @@ export default function Settlements() {
     if (!meta.availableBalance) return null;
 
     if (!meta.hasSettlementSetting) {
-      return "On hold — your settlement schedule hasn't been set up yet. Contact SPOTX support.";
+      return `${money(meta.availableBalance, meta.currency)} approved and waiting to be paid. SPOTX hasn't set your payout schedule yet — you'll be notified when it's set.`;
     }
 
     const parts = [];
@@ -100,11 +100,13 @@ export default function Settlements() {
     return parts.length ? parts.join(" · ") : null;
   }, [meta]);
 
+  // Open batches plus approved payments not batched yet — both go out in
+  // the next settlement.
   const upcomingAmount = useMemo(
     () => settlements
       .filter((s) => !["paid", "failed", "cancelled"].includes(s.status))
-      .reduce((sum, s) => sum + (s.amount?.net || 0), 0),
-    [settlements]
+      .reduce((sum, s) => sum + (s.amount?.net || 0), 0) + (meta.approvedAwaitingBatchAmount || 0),
+    [settlements, meta.approvedAwaitingBatchAmount]
   );
 
   const nextSettlementInfo = useMemo(() => {
@@ -112,7 +114,7 @@ export default function Settlements() {
       return { primary: money(upcomingAmount, meta.currency), secondary: `On ${new Date(meta.nextSettlementDate).toLocaleDateString()}`, footnote: "Final amount may vary" };
     }
     if (!meta.hasSettlementSetting) {
-      return { primary: "Not configured", secondary: "Contact SPOTX support" };
+      return { primary: "To be scheduled", secondary: "SPOTX will set your payout date" };
     }
     if (meta.settlementType === "threshold") {
       return { primary: `Threshold ${money(meta.minimumSettlementAmount, meta.currency)}`, secondary: `${money(meta.availableBalance, meta.currency)} of ${money(meta.minimumSettlementAmount, meta.currency)} so far` };

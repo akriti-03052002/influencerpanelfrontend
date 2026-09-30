@@ -72,6 +72,9 @@ export default function AdminSettlements() {
   const [partners, setPartners] = useState([]);
   const [partnerId, setPartnerId] = useState("");
   const [approvedCommissions, setApprovedCommissions] = useState([]);
+  // Approved payments not yet in any batch, across all influencers.
+  const [unbatched, setUnbatched] = useState([]);
+  const [selectAllOnLoad, setSelectAllOnLoad] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
@@ -83,15 +86,20 @@ export default function AdminSettlements() {
 
   const load = () => {
     setLoading(true);
-    return adminApi.get("/admin/settlements", { params: { partnerId: vendorFilter || undefined } })
-      .then((res) => { setSettlements(res.data.data); setLastFetchedAt(new Date()); })
+    return Promise.all([
+      adminApi.get("/admin/settlements", { params: { partnerId: vendorFilter || undefined } })
+        .then((res) => setSettlements(res.data.data)),
+      adminApi.get("/admin/commissions", { params: { status: "approved", partnerId: vendorFilter || undefined } })
+        .then((res) => setUnbatched(res.data.data))
+    ])
+      .then(() => setLastFetchedAt(new Date()))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [vendorFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    adminApi.get("/admin/partners", { params: { partnerType: "vendor" } }).then((res) => setVendors(res.data.data));
+    adminApi.get("/admin/partners", { params: { partnerType: "influencer" } }).then((res) => setVendors(res.data.data));
   }, []);
 
   useEffect(() => {
@@ -101,9 +109,13 @@ export default function AdminSettlements() {
   useEffect(() => {
     if (partnerId) {
       adminApi.get("/admin/commissions", { params: { status: "approved", partnerId } })
-        .then((res) => { setApprovedCommissions(res.data.data); setSelectedIds([]); });
+        .then((res) => {
+          setApprovedCommissions(res.data.data);
+          setSelectedIds(selectAllOnLoad ? res.data.data.map((c) => c._id) : []);
+          setSelectAllOnLoad(false);
+        });
     }
-  }, [partnerId]);
+  }, [partnerId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadBill = (id) => adminApi.get(`/admin/settlements/${id}/bill`).then((res) => setBill(res.data.data));
 
@@ -146,10 +158,39 @@ export default function AdminSettlements() {
     return { count: rows.length, amount: rows.reduce((sum, s) => sum + (s.amount?.net || 0), 0) };
   }, [settlements]);
 
+  const unbatchedTotal = useMemo(() => unbatched.reduce((sum, c) => sum + (c.calculation?.netCommission || 0), 0), [unbatched]);
+
+  // Everything earned and not yet paid: open batches plus approved payments
+  // that haven't been put in a batch yet.
   const totalOwed = useMemo(
-    () => settlements.filter((s) => OWED_STATUSES.includes(s.status)).reduce((sum, s) => sum + (s.amount?.net || 0), 0),
-    [settlements]
+    () => settlements.filter((s) => OWED_STATUSES.includes(s.status)).reduce((sum, s) => sum + (s.amount?.net || 0), 0) + unbatchedTotal,
+    [settlements, unbatchedTotal]
   );
+
+  const readyToSettle = useMemo(() => {
+    const byPartner = new Map();
+    for (const c of unbatched) {
+      const id = c.partnerId?._id || c.partnerId;
+      const row = byPartner.get(id) || { partnerId: id, name: c.partnerId?.legalEntity?.businessName || c.partnerId?.partnerCode || "Influencer", code: c.partnerId?.partnerCode, count: 0, total: 0 };
+      row.count += 1;
+      row.total += c.calculation?.netCommission || 0;
+      byPartner.set(id, row);
+    }
+    return [...byPartner.values()].sort((a, b) => b.total - a.total);
+  }, [unbatched]);
+
+  const startBatchFor = (id) => {
+    setError("");
+    setSelectAllOnLoad(true);
+    setShowCreate(true);
+    if (id === partnerId) {
+      setSelectedIds(approvedCommissions.map((c) => c._id));
+      setSelectAllOnLoad(false);
+    } else {
+      setPartnerId(id);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const filtered = useMemo(() => {
     const durationDef = DURATIONS.find((d) => d.key === duration);
@@ -312,9 +353,33 @@ export default function AdminSettlements() {
           <div className="pt-4 lg:pt-0 lg:pl-6">
             <p className="text-sm text-slate-500 underline decoration-slate-300 underline-offset-4">Total Owed to Influencers</p>
             <p className="text-3xl font-bold text-slate-900 mt-2">{money(totalOwed)}</p>
+            {unbatchedTotal > 0 && (
+              <p className="text-xs text-slate-500 mt-1">{money(unbatchedTotal)} approved, not yet in a batch</p>
+            )}
           </div>
         </div>
       </Card>
+
+      {readyToSettle.length > 0 && (
+        <Card>
+          <div className="p-5 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-900">Ready to settle</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Approved post/reel payments not yet in a settlement batch.</p>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {readyToSettle.map((row) => (
+              <div key={row.partnerId} className="px-5 py-3.5 flex items-center gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-slate-900 truncate">{row.name}</p>
+                  <p className="text-xs text-slate-400">{row.code} · {row.count} approved payment{row.count === 1 ? "" : "s"}</p>
+                </div>
+                <p className="font-semibold text-slate-900">{money(row.total)}</p>
+                <Button type="button" variant="outline" onClick={() => startBatchFor(row.partnerId)}>Create batch</Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       {showCreate && (
         <Card className="p-6 space-y-4">

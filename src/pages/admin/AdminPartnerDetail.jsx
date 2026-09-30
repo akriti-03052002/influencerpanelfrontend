@@ -8,6 +8,7 @@ import { Select } from "../../components/ui/Input";
 import DocumentPreviewModal from "../../components/admin/DocumentPreviewModal";
 import BankAccountPreviewModal from "../../components/admin/BankAccountPreviewModal";
 import SocialAccountRates from "../../components/admin/SocialAccountRates";
+import SettlementSchedule from "../../components/admin/SettlementSchedule";
 import { UploadCloud, FileText, AlertCircle } from "lucide-react";
 
 const STATUS_OPTIONS = ["draft", "pending_verification", "under_review", "active", "suspended", "rejected", "inactive"];
@@ -154,6 +155,8 @@ export default function AdminPartnerDetail() {
             <Button onClick={applyStatus} loading={busy}>Apply</Button>
           </div>
         </Card>
+
+        <SettlementSchedule partnerId={partner._id} />
 
       </div>
 
