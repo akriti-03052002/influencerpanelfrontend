@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { UploadCloud, Download, FileText, AlertCircle } from "lucide-react";
+import { UploadCloud, Download, FileText, AlertCircle, Eye } from "lucide-react";
 import api from "../../services/api";
 import Card from "../../components/ui/Card";
 import Badge from "../../components/ui/Badge";
 import Button from "../../components/ui/Button";
 import Logo from "../../components/ui/Logo";
+import DocumentViewer from "../../components/partner/DocumentViewer";
 
 // `required` is resolved per-partnerType from the backend (see
 // partnerVerification.js) once profile data loads — business types
@@ -30,6 +31,7 @@ export default function Documents() {
   const [pendingFiles, setPendingFiles] = useState({}); // { [documentType]: File }
   const [uploadingType, setUploadingType] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [previewDoc, setPreviewDoc] = useState(null);
   const [errors, setErrors] = useState({}); // { [documentType]: message }
 
   const load = () => {
@@ -151,25 +153,45 @@ export default function Documents() {
               <Badge status={agreementDoc.verification.status} />
             </div>
             <div className="flex items-center justify-between gap-3 p-2.5 bg-slate-50 rounded-lg">
-              <div className="flex items-center gap-2 min-w-0">
+              <button type="button" onClick={() => setPreviewDoc(agreementDoc)} className="flex items-center gap-2 min-w-0 text-left">
                 <FileText size={16} className="text-slate-400 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-slate-700 truncate">{agreementDoc.file.originalName}</p>
-                  <p className="text-xs text-slate-400">Generated {new Date(agreementDoc.createdAt).toLocaleDateString()}</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleDownload(agreementDoc)}
-                disabled={downloadingId === agreementDoc._id}
-                className="shrink-0 text-slate-400 hover:text-brand-black disabled:opacity-50"
-                aria-label="Download"
-              >
-                <Download size={16} />
+                <span className="min-w-0">
+                  <span className="block text-xs font-medium text-slate-700 truncate hover:underline">{agreementDoc.file.originalName}</span>
+                  <span className="block text-xs text-slate-400">Generated {new Date(agreementDoc.createdAt).toLocaleDateString()}</span>
+                </span>
               </button>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDoc(agreementDoc)}
+                  className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-white"
+                  aria-label="Preview"
+                >
+                  <Eye size={15} /> Preview
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDownload(agreementDoc)}
+                  disabled={downloadingId === agreementDoc._id}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-brand-black hover:bg-white disabled:opacity-50"
+                  aria-label="Download"
+                  title="Download"
+                >
+                  <Download size={16} />
+                </button>
+              </div>
             </div>
             {errors.partner_agreement && <p className="text-xs text-red-600 mt-2">{errors.partner_agreement}</p>}
           </Card>
+        )}
+
+        {previewDoc && (
+          <DocumentViewer
+            doc={previewDoc}
+            title="Influencer Agreement"
+            onClose={() => setPreviewDoc(null)}
+            onDownload={() => handleDownload(previewDoc)}
+          />
         )}
       </div>
     );
