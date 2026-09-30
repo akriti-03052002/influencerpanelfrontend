@@ -64,6 +64,25 @@ const BRANDS = {
 
 const formatCount = (n) => Number(n || 0).toLocaleString("en-IN");
 
+const rupees = (n) => `₹${Number(n).toLocaleString("en-IN")}`;
+
+// What SPOTX pays per approved post/reel from this account.
+export function EarningsLine({ rates, className = "" }) {
+  const post = rates?.post || 0;
+  const reel = rates?.reel || 0;
+  if (!post && !reel) {
+    return <p className={`text-xs text-slate-400 ${className}`}>Earnings not set yet — SPOTX will set your rate for this account.</p>;
+  }
+  return (
+    <p className={`text-sm text-emerald-800 ${className}`}>
+      You earn{" "}
+      {post ? <span className="font-semibold">{rupees(post)}</span> : <span className="text-slate-400">—</span>} per post
+      <span className="text-emerald-300"> · </span>
+      {reel ? <span className="font-semibold">{rupees(reel)}</span> : <span className="text-slate-400">—</span>} per reel
+    </p>
+  );
+}
+
 const timeAgo = (date) => {
   if (!date) return "never";
   const minutes = Math.round((Date.now() - new Date(date).getTime()) / 60000);
@@ -118,6 +137,8 @@ export default function SocialConnectCard({ platform, account, needsReconnect, c
               <p className="text-xs text-slate-500 mt-1">{brand.audience || "followers"}</p>
             </div>
           </div>
+
+          <EarningsLine rates={account.paymentRates} className="mb-4 rounded-xl bg-emerald-50 px-3 py-2.5" />
 
           <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 text-xs text-slate-500">

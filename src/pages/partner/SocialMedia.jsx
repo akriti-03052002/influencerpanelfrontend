@@ -5,7 +5,7 @@ import Card from "../../components/ui/Card";
 import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
 import { Input, Select } from "../../components/ui/Input";
-import SocialConnectCard, { InstagramLogo, FacebookLogo, YouTubeLogo } from "../../components/partner/SocialConnectCard";
+import SocialConnectCard, { InstagramLogo, FacebookLogo, YouTubeLogo, EarningsLine } from "../../components/partner/SocialConnectCard";
 
 const PLATFORMS = ["instagram", "youtube", "facebook"];
 const CONNECTABLE = ["instagram", "facebook", "youtube"];
@@ -210,6 +210,7 @@ export default function SocialMedia() {
                       <span className="text-slate-300"> · </span>
                       {account.connected ? "Auto-updating" : account.source === "oauth" ? "Connection lost" : "Added manually"}
                     </p>
+                    {account.reviewStatus !== "rejected" && <EarningsLine rates={account.paymentRates} className="mt-1" />}
                     {account.rejectionReason && <p className="text-xs text-red-600 mt-1">Admin note: {account.rejectionReason}</p>}
                   </div>
                   <Badge status={account.reviewStatus} />

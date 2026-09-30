@@ -17,6 +17,8 @@ export default function PostReel() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const verifiedAccounts = accounts.filter((account) => account.reviewStatus === "verified");
+  const selectedAccount = verifiedAccounts.find((account) => account._id === form.socialAccountId);
+  const selectedRate = selectedAccount?.paymentRates?.[form.contentType] || 0;
 
   const loadData = async () => {
     const [accountResponse, submissionResponse] = await Promise.all([
@@ -81,6 +83,17 @@ export default function PostReel() {
                 <option value="reel">Reel / short video</option>
               </Select>
             </div>
+            {selectedAccount && (
+              selectedRate ? (
+                <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                  You&apos;ll earn <span className="font-semibold">₹{selectedRate.toLocaleString("en-IN")}</span> when this {form.contentType} is approved.
+                </p>
+              ) : (
+                <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  No {form.contentType} rate is set for this account yet, so it can&apos;t be paid until SPOTX sets one.
+                </p>
+              )
+            )}
             <Input label="Post / reel URL" type="url" value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} placeholder="https://..." required />
             <Button type="submit" loading={busy}>Submit for review</Button>
           </form>
