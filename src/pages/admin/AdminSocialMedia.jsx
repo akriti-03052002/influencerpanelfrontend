@@ -25,11 +25,18 @@ const VIEWS = {
   }
 };
 
+const POST_TABS = [
+  { key: "pending", label: "Pending", empty: "Nothing waiting — every post and reel has been reviewed.", activeBadge: "bg-amber-100 text-amber-800" },
+  { key: "approved", label: "Approved", empty: "No approved posts or reels yet.", activeBadge: "bg-emerald-100 text-emerald-800" },
+  { key: "rejected", label: "Rejected", empty: "No rejected posts or reels.", activeBadge: "bg-red-100 text-red-700" }
+];
+
 // Two menu items share this page: "accounts" shows account verification,
 // "posts" shows post/reel review.
 export default function AdminSocialMedia({ view = "accounts" }) {
   const [accounts, setAccounts] = useState([]);
   const [submissions, setSubmissions] = useState([]);
+  const [postTab, setPostTab] = useState("pending");
   const [reasons, setReasons] = useState({});
   const [notes, setNotes] = useState({});
   const [ownership, setOwnership] = useState({});
@@ -127,6 +134,8 @@ export default function AdminSocialMedia({ view = "accounts" }) {
     }
   };
 
+  const shownSubmissions = submissions.filter((s) => s.status === postTab);
+
   return (
     <div className="space-y-6">
       <div>
@@ -202,14 +211,28 @@ export default function AdminSocialMedia({ view = "accounts" }) {
 
       {view === "posts" && (
       <Card>
-        <div className="p-5 border-b border-slate-100">
-          <h2 className="font-semibold text-slate-900">Post / reel review and payment</h2>
+        <div className="px-5 pt-4 border-b border-slate-100 flex items-center gap-1">
+          {POST_TABS.map((tab) => {
+            const count = submissions.filter((s) => s.status === tab.key).length;
+            const active = postTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setPostTab(tab.key)}
+                className={`px-3 py-2.5 -mb-px border-b-2 text-sm font-semibold transition flex items-center gap-2 ${active ? "border-brand-black text-slate-900" : "border-transparent text-slate-500 hover:text-slate-800"}`}
+              >
+                {tab.label}
+                <span className={`min-w-[22px] px-1.5 py-0.5 rounded-full text-xs ${active ? tab.activeBadge : "bg-slate-100 text-slate-500"}`}>{count}</span>
+              </button>
+            );
+          })}
         </div>
-        {loading ? <p className="p-6 text-sm text-slate-400">Loading submissions...</p> : submissions.length === 0 ? (
-          <p className="p-6 text-sm text-slate-500">No posts or reels submitted.</p>
+        {loading ? <p className="p-6 text-sm text-slate-400">Loading submissions...</p> : shownSubmissions.length === 0 ? (
+          <p className="p-8 text-center text-sm text-slate-500">{POST_TABS.find((t) => t.key === postTab).empty}</p>
         ) : (
           <div className="divide-y divide-slate-100">
-            {submissions.map((submission) => (
+            {shownSubmissions.map((submission) => (
               <div key={submission._id} className="p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-start gap-3">
                   <div className="flex-1 min-w-0">
