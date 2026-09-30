@@ -1,9 +1,10 @@
 import axios from "axios";
+import apiBaseUrl from "./apiBaseUrl";
 
 // Admin-side axios instance. Fully separate token/storage keys from
 // the partner instance so the two sessions never cross.
 const adminApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5000/api`,
+  baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json"
   }

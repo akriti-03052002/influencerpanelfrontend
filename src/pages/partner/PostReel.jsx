@@ -64,7 +64,9 @@ export default function PostReel() {
       <Card className="p-6">
         {error && <p role="alert" className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</p>}
         {message && <p role="status" className="mb-4 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{message}</p>}
-        {verifiedAccounts.length > 0 ? (
+        {loading ? (
+          <p className="text-sm text-slate-400">Loading your accounts...</p>
+        ) : verifiedAccounts.length > 0 ? (
           <form onSubmit={submit} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
               <Select label="Verified account" value={form.socialAccountId} onChange={(event) => setForm({ ...form, socialAccountId: event.target.value })} required>
@@ -82,7 +84,7 @@ export default function PostReel() {
             <Input label="Post / reel URL" type="url" value={form.url} onChange={(event) => setForm({ ...form, url: event.target.value })} placeholder="https://..." required />
             <Button type="submit" loading={busy}>Submit for review</Button>
           </form>
-        ) : (
+        ) : error && accounts.length === 0 ? null : (
           <div className="text-sm text-slate-600">
             {accounts.length === 0
               ? "Submit a social account first. You can submit content after an admin verifies it."
@@ -95,7 +97,9 @@ export default function PostReel() {
         <div className="p-5 border-b border-slate-100">
           <h2 className="font-semibold text-slate-900">Your submissions</h2>
         </div>
-        {loading ? <p className="p-6 text-sm text-slate-400">Loading submissions...</p> : submissions.length === 0 ? (
+        {loading ? <p className="p-6 text-sm text-slate-400">Loading submissions...</p> : error && submissions.length === 0 ? (
+          <p className="p-6 text-sm text-slate-500">Couldn&apos;t load your submissions. Refresh the page to try again.</p>
+        ) : submissions.length === 0 ? (
           <div className="p-8 text-center text-sm text-slate-500">
             <Clapperboard size={24} className="mx-auto mb-2 text-slate-300" />
             No posts or reels submitted yet.
