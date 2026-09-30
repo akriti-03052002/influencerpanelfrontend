@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, UserPlus, FileCheck, Landmark, Share2, Clapperboard, Receipt } from "lucide-react";
+import { Bell, UserPlus, FileCheck, Landmark, Share2, Clapperboard, Receipt, ChevronRight } from "lucide-react";
 import adminApi from "../../services/adminApi";
 
 // How often the bell checks for new activity while the admin panel is open.
@@ -31,6 +31,7 @@ export default function AdminNotificationBell() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [pending, setPending] = useState({ posts: 0, accounts: 0 });
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -39,6 +40,7 @@ export default function AdminNotificationBell() {
       .then((res) => {
         setNotifications(res.data.data.notifications);
         setUnreadCount(res.data.data.unreadCount);
+        setPending(res.data.data.pending || { posts: 0, accounts: 0 });
       })
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -96,6 +98,26 @@ export default function AdminNotificationBell() {
                 </button>
               )}
             </div>
+
+            {(pending.posts > 0 || pending.accounts > 0) && (
+              <button
+                type="button"
+                onClick={() => { setOpen(false); navigate("/admin/social-media"); }}
+                className="w-full text-left px-4 py-3 flex items-center gap-3 bg-amber-50 border-b border-amber-100 hover:bg-amber-100/60"
+              >
+                <span className="w-8 h-8 shrink-0 rounded-lg grid place-items-center bg-amber-100 text-amber-700"><Clapperboard size={15} /></span>
+                <span className="flex-1 min-w-0 text-sm text-amber-900">
+                  <span className="block font-semibold">Waiting for your review</span>
+                  <span className="block text-xs">
+                    {[
+                      pending.posts > 0 && `${pending.posts} post${pending.posts === 1 ? "" : "s"}/reel${pending.posts === 1 ? "" : "s"}`,
+                      pending.accounts > 0 && `${pending.accounts} social account${pending.accounts === 1 ? "" : "s"}`
+                    ].filter(Boolean).join(" · ")}
+                  </span>
+                </span>
+                <ChevronRight size={16} className="text-amber-700" />
+              </button>
+            )}
 
             <div className="max-h-[28rem] overflow-y-auto divide-y divide-slate-100">
               {loading ? (

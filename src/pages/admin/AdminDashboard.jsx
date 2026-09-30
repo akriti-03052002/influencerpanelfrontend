@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Building2, FileCheck, Landmark, Wallet, Users, UserCheck, Banknote } from "lucide-react";
+import { Building2, FileCheck, Landmark, Clapperboard, Users, UserCheck, Banknote } from "lucide-react";
 import { Link } from "react-router-dom";
 import adminApi from "../../services/adminApi";
 import Card from "../../components/ui/Card";
@@ -33,15 +33,15 @@ export default function AdminDashboard() {
       adminApi.get("/admin/partners", { params: { status: "pending_verification" } }),
       adminApi.get("/admin/documents/pending"),
       adminApi.get("/admin/bank/pending"),
-      adminApi.get("/admin/commissions", { params: { status: "pending" } }),
+      adminApi.get("/admin/social-media/posts", { params: { status: "pending" } }),
       adminApi.get("/admin/settlements", { params: { status: "draft" } }),
       adminApi.get("/admin/stats/kpis")
-    ]).then(([partners, documents, bank, commissions, settlements, statsRes]) => {
+    ]).then(([partners, documents, bank, pendingPosts, settlements, statsRes]) => {
       setCounts({
         pendingPartners: partners.data.data.length,
         pendingDocuments: documents.data.data.length,
         pendingBank: bank.data.data.length,
-        pendingCommissions: commissions.data.data.length,
+        pendingPosts: pendingPosts.data.data.length,
         draftSettlements: settlements.data.data.length
       });
       setKpis(statsRes.data.data);
@@ -58,7 +58,7 @@ export default function AdminDashboard() {
         <Link to="/admin/partners"><StatCard label="Pending Influencer Verification" value={counts.pendingPartners} icon={Building2} tone="brand" /></Link>
         <Link to="/admin/documents"><StatCard label="Pending KYC Documents" value={counts.pendingDocuments} icon={FileCheck} /></Link>
         <Link to="/admin/bank"><StatCard label="Pending Bank Verification" value={counts.pendingBank} icon={Landmark} /></Link>
-        <Link to="/admin/commissions"><StatCard label="Pending Commission Approvals" value={counts.pendingCommissions} icon={Wallet} /></Link>
+        <Link to="/admin/social-media"><StatCard label="Posts & Reels to Review" value={counts.pendingPosts} icon={Clapperboard} tone={counts.pendingPosts > 0 ? "brand" : undefined} /></Link>
       </div>
 
       {kpis && (
