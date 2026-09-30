@@ -58,7 +58,7 @@ export default function AdminDashboard() {
         <Link to="/admin/partners"><StatCard label="Pending Influencer Verification" value={counts.pendingPartners} icon={Building2} tone="brand" /></Link>
         <Link to="/admin/documents"><StatCard label="Pending KYC Documents" value={counts.pendingDocuments} icon={FileCheck} /></Link>
         <Link to="/admin/bank"><StatCard label="Pending Bank Verification" value={counts.pendingBank} icon={Landmark} /></Link>
-        <Link to="/admin/social-media"><StatCard label="Posts & Reels to Review" value={counts.pendingPosts} icon={Clapperboard} tone={counts.pendingPosts > 0 ? "brand" : undefined} /></Link>
+        <Link to="/admin/social-media/posts"><StatCard label="Posts & Reels to Review" value={counts.pendingPosts} icon={Clapperboard} tone={counts.pendingPosts > 0 ? "brand" : undefined} /></Link>
       </div>
 
       {kpis && (

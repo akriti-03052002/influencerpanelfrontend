@@ -17,7 +17,8 @@ const NAV_ITEMS = [
     label: "Social Media",
     icon: Share2,
     children: [
-      { to: "/admin/social-media", label: "Accounts & Posts" }
+      { to: "/admin/social-media/accounts", label: "Social Account Review" },
+      { to: "/admin/social-media/posts", label: "Post / Reel Review" }
     ]
   },
   { to: "/admin/settlements", label: "Settlements", icon: Landmark },

@@ -99,25 +99,21 @@ export default function AdminNotificationBell() {
               )}
             </div>
 
-            {(pending.posts > 0 || pending.accounts > 0) && (
+            {[
+              { key: "posts", count: pending.posts, label: (n) => `${n} post${n === 1 ? "" : "s"}/reel${n === 1 ? "" : "s"} to review`, to: "/admin/social-media/posts", Icon: Clapperboard },
+              { key: "accounts", count: pending.accounts, label: (n) => `${n} social account${n === 1 ? "" : "s"} to verify`, to: "/admin/social-media/accounts", Icon: Share2 }
+            ].filter((row) => row.count > 0).map(({ key, count, label, to, Icon }) => (
               <button
+                key={key}
                 type="button"
-                onClick={() => { setOpen(false); navigate("/admin/social-media"); }}
-                className="w-full text-left px-4 py-3 flex items-center gap-3 bg-amber-50 border-b border-amber-100 hover:bg-amber-100/60"
+                onClick={() => { setOpen(false); navigate(to); }}
+                className="w-full text-left px-4 py-2.5 flex items-center gap-3 bg-amber-50 border-b border-amber-100 hover:bg-amber-100/60"
               >
-                <span className="w-8 h-8 shrink-0 rounded-lg grid place-items-center bg-amber-100 text-amber-700"><Clapperboard size={15} /></span>
-                <span className="flex-1 min-w-0 text-sm text-amber-900">
-                  <span className="block font-semibold">Waiting for your review</span>
-                  <span className="block text-xs">
-                    {[
-                      pending.posts > 0 && `${pending.posts} post${pending.posts === 1 ? "" : "s"}/reel${pending.posts === 1 ? "" : "s"}`,
-                      pending.accounts > 0 && `${pending.accounts} social account${pending.accounts === 1 ? "" : "s"}`
-                    ].filter(Boolean).join(" · ")}
-                  </span>
-                </span>
+                <span className="w-8 h-8 shrink-0 rounded-lg grid place-items-center bg-amber-100 text-amber-700"><Icon size={15} /></span>
+                <span className="flex-1 min-w-0 text-sm font-semibold text-amber-900">{label(count)}</span>
                 <ChevronRight size={16} className="text-amber-700" />
               </button>
-            )}
+            ))}
 
             <div className="max-h-[28rem] overflow-y-auto divide-y divide-slate-100">
               {loading ? (

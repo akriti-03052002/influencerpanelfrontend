@@ -14,7 +14,20 @@ const needsAction = (account) =>
   account.reviewStatus === "pending" ||
   (account.reviewStatus === "verified" && !account.paymentRates?.post && !account.paymentRates?.reel);
 
-export default function AdminSocialMedia() {
+const VIEWS = {
+  accounts: {
+    title: "Social Account Review",
+    subtitle: "Verify influencers' social accounts and set the price paid for posts and reels from each one."
+  },
+  posts: {
+    title: "Post / Reel Review",
+    subtitle: "Check submitted post and reel links for ownership and duplicates, then approve to assign the payment."
+  }
+};
+
+// Two menu items share this page: "accounts" shows account verification,
+// "posts" shows post/reel review.
+export default function AdminSocialMedia({ view = "accounts" }) {
   const [accounts, setAccounts] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [reasons, setReasons] = useState({});
@@ -117,13 +130,14 @@ export default function AdminSocialMedia() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Social Media Review</h1>
-        <p className="text-sm text-slate-500 mt-1">Verify influencer accounts, check post/reel URLs for duplicates and ownership, and assign approved payments.</p>
+        <h1 className="text-2xl font-bold text-slate-900">{VIEWS[view].title}</h1>
+        <p className="text-sm text-slate-500 mt-1">{VIEWS[view].subtitle}</p>
       </div>
 
       {error && <p role="alert" className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">{error}</p>}
       {message && <p role="status" className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">{message}</p>}
 
+      {view === "accounts" && (
       <Card>
         <div className="p-5 border-b border-slate-100 flex items-center gap-2">
           <Share2 size={18} className="text-slate-500" />
@@ -184,7 +198,9 @@ export default function AdminSocialMedia() {
           </div>
         )}
       </Card>
+      )}
 
+      {view === "posts" && (
       <Card>
         <div className="p-5 border-b border-slate-100">
           <h2 className="font-semibold text-slate-900">Post / reel review and payment</h2>
@@ -242,6 +258,7 @@ export default function AdminSocialMedia() {
           </div>
         )}
       </Card>
+      )}
     </div>
   );
 }

@@ -109,7 +109,9 @@ function App() {
               <Route path="documents" element={<AdminDocuments />} />
               <Route path="bank" element={<AdminBank />} />
               <Route path="settlements" element={<AdminSettlements />} />
-              <Route path="social-media" element={<AdminSocialMedia />} />
+              <Route path="social-media" element={<Navigate to="/admin/social-media/accounts" replace />} />
+              <Route path="social-media/accounts" element={<AdminSocialMedia view="accounts" key="accounts" />} />
+              <Route path="social-media/posts" element={<AdminSocialMedia view="posts" key="posts" />} />
               <Route path="agreement" element={<AdminAgreement />} />
             </Route>
 
