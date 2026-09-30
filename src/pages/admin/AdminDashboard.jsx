@@ -70,7 +70,7 @@ export default function AdminDashboard() {
             <StatCard label="Total Payouts Paid" value={`₹${kpis.totalPayoutsPaid.toLocaleString()}`} icon={Banknote} />
           </div>
           <p className="text-xs text-slate-400 mt-4">
-            {kpis.totalPartners} total partners ({kpis.activePartners} active) · ₹{kpis.totalCommissionGenerated.toLocaleString()} total commission generated
+            {kpis.totalPartners} total influencers ({kpis.activePartners} active) · ₹{kpis.totalCommissionGenerated.toLocaleString()} earned from approved posts & reels
           </p>
         </Card>
       )}
