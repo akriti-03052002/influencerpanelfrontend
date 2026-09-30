@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, Building2, FileCheck, Landmark,
-  Wallet, LogOut, Menu, X, Share2
+  Wallet, LogOut, FileSignature, Menu, X, Share2
 } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import { useAdminAuth } from "../context/AdminAuthContext";
@@ -19,7 +19,8 @@ const NAV_ITEMS = [
       { to: "/admin/social-media", label: "Accounts & Posts" }
     ]
   },
-  { to: "/admin/settlements", label: "Settlements", icon: Landmark }
+  { to: "/admin/settlements", label: "Settlements", icon: Landmark },
+  { to: "/admin/agreement", label: "Agreement", icon: FileSignature }
 ];
 
 export default function AdminLayout() {

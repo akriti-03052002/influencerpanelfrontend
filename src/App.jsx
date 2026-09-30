@@ -34,6 +34,7 @@ import AdminDocuments from "./pages/admin/AdminDocuments";
 import AdminBank from "./pages/admin/AdminBank";
 import AdminSettlements from "./pages/admin/AdminSettlements";
 import AdminSocialMedia from "./pages/admin/AdminSocialMedia";
+import AdminAgreement from "./pages/admin/AdminAgreement";
 
 // ======================================================
 // PARTNER ROUTE GUARDS
@@ -109,6 +110,7 @@ function App() {
               <Route path="bank" element={<AdminBank />} />
               <Route path="settlements" element={<AdminSettlements />} />
               <Route path="social-media" element={<AdminSocialMedia />} />
+              <Route path="agreement" element={<AdminAgreement />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
