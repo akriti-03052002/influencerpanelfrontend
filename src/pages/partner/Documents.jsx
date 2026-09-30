@@ -134,6 +134,13 @@ export default function Documents() {
           </p>
         </Card>
 
+        {!agreementDoc && (
+          <Card className="p-5 max-w-md">
+            <p className="text-sm font-semibold text-slate-900">Influencer Agreement</p>
+            <p className="text-xs text-slate-500 mt-1">Your agreement is being prepared. Refresh this page in a moment to download it.</p>
+          </Card>
+        )}
+
         {agreementDoc && (
           <Card className="p-5 max-w-md">
             <div className="flex items-start justify-between gap-3 mb-3">
