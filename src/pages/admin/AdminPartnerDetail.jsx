@@ -127,7 +127,7 @@ export default function AdminPartnerDetail() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            {partner.legalEntity.businessName || <span className="text-slate-400 italic">Incomplete profile</span>}
+            {partner.primaryContact.name}
           </h1>
           <p className="text-sm text-slate-400">{partner.partnerCode} · {partner.primaryContact.email}</p>
         </div>

@@ -54,7 +54,7 @@ export default function AdminBank() {
             empty="No bank accounts waiting for review."
             rows={accounts}
             columns={[
-              { key: "partner", header: "Influencer", render: (a) => a.partnerId?.legalEntity?.businessName || "—" },
+              { key: "partner", header: "Influencer", render: (a) => a.partnerId?.primaryContact?.name || "—" },
               { key: "bank", header: "Bank", render: (a) => a.bankName },
               { key: "acct", header: "Account", render: (a) => revealed[a._id] ? `${revealed[a._id].accountNumber} / ${revealed[a._id].ifsc}` : `•••• ${a.accountNumberLast4}` },
               {

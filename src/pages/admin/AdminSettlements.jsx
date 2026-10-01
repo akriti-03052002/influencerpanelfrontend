@@ -171,7 +171,7 @@ export default function AdminSettlements() {
     const byPartner = new Map();
     for (const c of unbatched) {
       const id = c.partnerId?._id || c.partnerId;
-      const row = byPartner.get(id) || { partnerId: id, name: c.partnerId?.legalEntity?.businessName || c.partnerId?.partnerCode || "Influencer", code: c.partnerId?.partnerCode, count: 0, total: 0 };
+      const row = byPartner.get(id) || { partnerId: id, name: c.partnerId?.primaryContact?.name || c.partnerId?.partnerCode || "Influencer", code: c.partnerId?.partnerCode, count: 0, total: 0 };
       row.count += 1;
       row.total += c.calculation?.netCommission || 0;
       byPartner.set(id, row);
@@ -387,7 +387,7 @@ export default function AdminSettlements() {
 
           <Select label="Influencer" value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
             <option value="">Select an influencer</option>
-            {partners.map((p) => <option key={p._id} value={p._id}>{p.legalEntity.businessName || `${p.partnerCode} (incomplete profile)`}</option>)}
+            {partners.map((p) => <option key={p._id} value={p._id}>{p.primaryContact?.name || p.partnerCode}</option>)}
           </Select>
 
           {partnerId && (
@@ -428,7 +428,7 @@ export default function AdminSettlements() {
             <Select value={vendorFilter} onChange={(e) => setVendorFilter(e.target.value)} className="w-56">
               <option value="">All influencers</option>
               {vendors.map((v) => (
-                <option key={v._id} value={v._id}>{v.legalEntity.businessName} ({v.partnerCode})</option>
+                <option key={v._id} value={v._id}>{v.primaryContact?.name} ({v.partnerCode})</option>
               ))}
             </Select>
             <Select value={duration} onChange={(e) => setDuration(e.target.value)} className="w-40">
@@ -474,7 +474,7 @@ export default function AdminSettlements() {
                   header: "Influencer",
                   render: (s) => (
                     <div className="flex flex-col gap-0.5">
-                      <span>{s.partnerId?.legalEntity?.businessName || s.partnerId?.partnerCode || "—"}</span>
+                      <span>{s.partnerId?.primaryContact?.name || s.partnerId?.partnerCode || "—"}</span>
                       {s.partnerId?._id && (
                         <Link
                           to={`/admin/partners/${s.partnerId._id}`}
@@ -773,7 +773,7 @@ function SettlementDetailPanel({ settlement, bill, history, billActionError, onV
             <div className="flex items-center justify-between gap-2 text-sm border border-slate-100 rounded-xl p-3">
               <div className="flex items-center gap-2 min-w-0">
                 <Landmark size={14} className="text-slate-400 shrink-0" />
-                <span className="text-slate-600 truncate">{settlement.partnerId?.legalEntity?.businessName || settlement.partnerId?.partnerCode || "—"}</span>
+                <span className="text-slate-600 truncate">{settlement.partnerId?.primaryContact?.name || settlement.partnerId?.partnerCode || "—"}</span>
               </div>
               {settlement.partnerId?._id && (
                 <Link

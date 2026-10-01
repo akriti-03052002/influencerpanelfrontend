@@ -43,7 +43,6 @@ export default function Profile() {
       const { partner, profileComplete } = res.data.data;
       setProfileComplete(profileComplete);
       setForm({
-        businessName: partner.legalEntity.businessName,
         legalName: partner.legalEntity.legalName,
         contactName: partner.primaryContact.name,
         phone: partner.primaryContact.phone,
@@ -152,7 +151,7 @@ export default function Profile() {
 
     try {
       await api.patch("/partner/profile", { ...form, socialAccounts });
-      setProfileComplete(Boolean(form.businessName));
+      setProfileComplete(Boolean(form.state && form.city));
       setMessage("Profile updated.");
     } finally {
       setSaving(false);
@@ -170,7 +169,7 @@ export default function Profile() {
       {!profileComplete && (
         <div className="flex items-start gap-2 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
           <UserCog size={16} className="shrink-0 mt-0.5" />
-          <span>Your profile is incomplete. At minimum, add your business name below so SPOTX can move you toward verification.</span>
+          <span>Your profile is incomplete. Add your state and city below so SPOTX can move you toward verification.</span>
         </div>
       )}
 
@@ -178,8 +177,7 @@ export default function Profile() {
         {message && <div className="mb-4 p-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">{message}</div>}
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input label="Business Name *" name="businessName" value={form.businessName} onChange={handleChange} disabled={!canEdit} />
-          <Input label="Legal Name" name="legalName" value={form.legalName} onChange={handleChange} disabled={!canEdit} />
+          <Input label="Legal Name (as on PAN)" name="legalName" value={form.legalName} onChange={handleChange} disabled={!canEdit} />
 
           <Input label="Contact Name" name="contactName" value={form.contactName} onChange={handleChange} disabled={!canEdit} />
           <Input label="Phone" name="phone" value={form.phone} onChange={handleChange} disabled={!canEdit} />

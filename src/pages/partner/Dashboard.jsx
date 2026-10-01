@@ -54,7 +54,7 @@ export default function Dashboard() {
         <div className="flex items-start justify-between gap-3 text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
           <div className="flex items-start gap-2">
             <UserCog size={16} className="shrink-0 mt-0.5" />
-            <span>Your profile is incomplete — add your business details to move toward verification.</span>
+            <span>Your profile is incomplete — add your address to move toward verification.</span>
           </div>
           <Link to="/partner/profile" className="font-semibold shrink-0 hover:underline">Complete Profile</Link>
         </div>

@@ -112,8 +112,8 @@ export default function AdminPartners() {
               { key: "code", header: "Code", render: (p) => p.partnerCode },
               {
                 key: "name",
-                header: "Business",
-                render: (p) => p.legalEntity.businessName || <span className="text-slate-400 italic">Incomplete profile</span>
+                header: "Name",
+                render: (p) => p.primaryContact?.name || "—"
               },
               { key: "type", header: "Type", render: (p) => <Badge tone="neutral">{p.partnerType}</Badge> },
               { key: "status", header: "Status", render: (p) => <Badge status={p.status} /> },

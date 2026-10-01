@@ -59,7 +59,7 @@ export default function AdminCommissions() {
             empty="No commissions found."
             rows={commissions}
             columns={[
-              { key: "partner", header: "Influencer", render: (c) => c.partnerId?.legalEntity?.businessName || "—" },
+              { key: "partner", header: "Influencer", render: (c) => c.partnerId?.primaryContact?.name || "—" },
               { key: "net", header: "Net Commission", render: (c) => `₹${c.calculation.netCommission.toLocaleString()}` },
               { key: "status", header: "Status", render: (c) => <Badge status={c.settlement.status} /> },
               { key: "date", header: "Earned", render: (c) => new Date(c.createdAt).toLocaleDateString() },

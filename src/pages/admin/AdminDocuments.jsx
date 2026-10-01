@@ -30,7 +30,7 @@ export default function AdminDocuments() {
             empty="No documents waiting for review."
             rows={documents}
             columns={[
-              { key: "partner", header: "Influencer", render: (d) => d.partnerId?.legalEntity?.businessName || "—" },
+              { key: "partner", header: "Influencer", render: (d) => d.partnerId?.primaryContact?.name || "—" },
               { key: "type", header: "Document", render: (d) => d.documentType.replace(/_/g, " ") },
               { key: "name", header: "File", render: (d) => d.file.originalName },
               { key: "date", header: "Uploaded", render: (d) => new Date(d.createdAt).toLocaleDateString() },

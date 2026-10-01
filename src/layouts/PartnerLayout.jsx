@@ -144,7 +144,7 @@ export default function PartnerLayout() {
             <Menu size={22} />
           </button>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-900 truncate">{partner?.businessName}</p>
+            <p className="text-sm font-semibold text-slate-900 truncate">{partner?.name || user?.name}</p>
             <p className="text-xs text-slate-400">{partner?.partnerCode}</p>
           </div>
           <div className="ml-auto flex items-center gap-2 shrink-0">
