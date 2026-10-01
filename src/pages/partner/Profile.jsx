@@ -8,7 +8,6 @@ import { Input, Select } from "../../components/ui/Input";
 import { usePartnerAuth } from "../../context/PartnerAuthContext";
 import { CITIES_BY_STATE } from "../../data/indiaCitiesByState";
 
-const ENTITY_TYPES = ["proprietorship", "partnership", "llp", "private_limited", "public_limited", "individual", "other"];
 
 // country-state-city gives real, ISO-linked state/province lists for all
 // 250 countries — used instead of a hand-maintained country list + the
@@ -46,9 +45,6 @@ export default function Profile() {
       setForm({
         businessName: partner.legalEntity.businessName,
         legalName: partner.legalEntity.legalName,
-        entityType: partner.legalEntity.entityType || "",
-        website: partner.legalEntity.website,
-        industry: partner.legalEntity.industry,
         contactName: partner.primaryContact.name,
         phone: partner.primaryContact.phone,
         designation: partner.primaryContact.designation,
@@ -185,13 +181,6 @@ export default function Profile() {
           <Input label="Business Name *" name="businessName" value={form.businessName} onChange={handleChange} disabled={!canEdit} />
           <Input label="Legal Name" name="legalName" value={form.legalName} onChange={handleChange} disabled={!canEdit} />
 
-          <Select label="Entity Type" name="entityType" value={form.entityType} onChange={handleChange} disabled={!canEdit}>
-            <option value="">Select entity type</option>
-            {ENTITY_TYPES.map((t) => <option key={t} value={t}>{t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</option>)}
-          </Select>
-
-          <Input label="Website" name="website" value={form.website} onChange={handleChange} disabled={!canEdit} />
-          <Input label="Industry" name="industry" value={form.industry} onChange={handleChange} disabled={!canEdit} />
           <Input label="Contact Name" name="contactName" value={form.contactName} onChange={handleChange} disabled={!canEdit} />
           <Input label="Phone" name="phone" value={form.phone} onChange={handleChange} disabled={!canEdit} />
           <Input label="Designation" name="designation" value={form.designation} onChange={handleChange} disabled={!canEdit} />
